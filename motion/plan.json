@@ -1,0 +1,20 @@
+{
+  "title": "Marvant Evolutions · AI SEO (9:16)",
+  "video": "work/source.mp4",
+  "fps": "30",
+  "clips": [
+    {"id":"01","title":"8.5 billion searches → how many reach you?","line":"“Google gets 8.5 billion searches a day. How many of them end on your website? If the answer isn't enough…”","in":0.00,"out":6.93,"kind":"full","file":"out/01-searches_0m00s00.mp4"},
+    {"id":"02","title":"Meet AI SEO by Marvant Evolutions","line":"“Meet AI SEO by Marvant Evolutions.”","in":6.93,"out":10.73,"kind":"full","file":"out/02-brand_0m06s93.mp4"},
+    {"id":"03","title":"Keyword dashboard · minutes, not weeks","line":"“AI that uncovers your highest converting keywords in minutes, not weeks.”","in":10.73,"out":15.13,"kind":"full","file":"out/03-keywords_0m10s73.mp4"},
+    {"id":"04","title":"Terminal · content engineered to rank","line":"“Intelligent content engineered to rank and written at machine speed. The result:”","in":15.13,"out":19.37,"kind":"full","file":"out/04-terminal_0m15s13.mp4"},
+    {"id":"05","title":"Rankings → compounding traffic chart","line":"“Higher Google rankings, traffic that keeps compounding.”","in":19.37,"out":22.17,"kind":"full","file":"out/05-growth_0m19s37.mp4"},
+    {"id":"06","title":"Stop guessing / start owning search toggle","line":"“Stop guessing. Start owning search.”","in":22.17,"out":24.30,"kind":"full","file":"out/06-toggle_0m22s17.mp4"},
+    {"id":"07","title":"End card · Book your strategy call","line":"“Marvant Evolutions. Search, evolved. Book your strategy call at marvant.com”","in":24.30,"out":29.91,"kind":"full","file":"out/07-endcard_0m24s30.mp4"}
+  ],
+  "notes": [
+    "The only real figure shown is 8.5 billion searches a day, taken from the script.",
+    "Illustrative: the typed search query, the 12 search pills and the 'visitors from search' bar (clip 01); the keyword names and conversion bars (clip 03); the terminal command and output (clip 04); the ranking and traffic curve shapes, which have no axis values (clip 05).",
+    "The sparkle tile is a placeholder mark. Swap in the Marvant logo if you have one.",
+    "Clips run back to back with no gaps. Each clip starts on the shape the previous one ended on, so the hard cuts read as one continuous morph."
+  ]
+}

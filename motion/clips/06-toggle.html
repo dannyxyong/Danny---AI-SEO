@@ -1,0 +1,31 @@
+<title>06 Stop guessing</title>
+<div data-slot="shape">
+  <div class="L" id="Ltog">
+    <div class="row" id="la" style="left:0;top:-210px;transform:translateX(-50%);gap:22px;font-size:76px;font-weight:650;letter-spacing:-.035em;color:#0B0B0B"><span id="icX"></span><span style="position:relative">Guessing<i id="strike" style="position:absolute;left:0;top:44px;height:7px;border-radius:4px;background:#0B0B0B"></i></span></div>
+    <div class="row" id="lb" style="left:0;top:-210px;transform:translateX(-50%);gap:22px;font-size:76px;font-weight:650;letter-spacing:-.035em;color:#fff"><span id="icC"></span>Owning search</div>
+    <div class="a" id="trk" style="left:-150px;top:-20px;width:300px;height:160px;border-radius:80px"></div>
+    <div class="a" id="knob" style="top:-4px;width:128px;height:128px;border-radius:64px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18)"></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icX').innerHTML=M.icon('x',64,'#0B0B0B',3.4); $('icC').innerHTML=M.icon('check',64,'#fff',3.4);
+// clip-local word times: stop 0, guessing 0.28, start 0.83, owning 1.10, search 1.42
+const kx=M.track(-134,[[0.83,6,M.FAST]]);
+const tc=M.ctrack('#D6D3CE',[[0.83,'#0B0B0B']]);
+const fade=(el,v)=>{el.style.opacity=v.o.toFixed(4); el.style.filter=v.blur>0.05?`blur(${v.blur.toFixed(2)}px)`:'none';};
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:2.13,intro:null,camSpring:M.MORPH,
+  SH:{prev:{w:900,h:1160,r:48,bg:'#FFFFFF',cam:1.0}, tog:{w:820,h:520,r:60,bg:'#FFFFFF',cam:1.1}, own:{w:820,h:520,r:60,bg:'#8192e3',cam:1.1}},
+  start:'prev', SEQ:[[0.0,'tog'],[0.83,'own']],
+  layers:[
+    {el:'Ltog',tin:0.0,tout:1.98,o:{din:0.05,lout:0.12},update:(t)=>{
+      fade($('la'),M.vis(t,0.0,0.83,{din:0.05})); fade($('lb'),M.vis(t,0.83,null,{din:0.06}));
+      $('strike').style.width=($('strike').parentNode.offsetWidth*M.eio((t-0.28)/0.3))+'px';
+      $('trk').style.background=tc(t); $('knob').style.left=kx(t)+'px';
+      $('knob').style.transform=`scaleX(${1+0.18*Math.sin(Math.PI*M.clamp((t-0.8)/0.3))})`;
+    }},
+  ],
+  cursor:{size:54,clicks:[0.83],keys:[[0,380,430],[0.25,380,430],[0.7,30,70],[0.95,30,70],[1.6,330,330]]},
+});
+</script>

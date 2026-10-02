@@ -1,0 +1,48 @@
+<title>07 End card</title>
+<div data-slot="shape">
+  <div class="L" id="Llogo">
+    <div class="a" id="tile" style="left:-70px;top:-290px;width:140px;height:140px;border-radius:40px;background:#8192e3"><div class="a" id="icS" style="left:30px;top:30px"></div></div>
+    <div class="a" id="w1" style="left:-420px;top:-110px;width:840px;text-align:center;color:#fff;font-size:124px;line-height:124px;font-weight:650;letter-spacing:-.05em">Marvant</div>
+    <div class="a" id="w2" style="left:-420px;top:10px;width:840px;text-align:center;color:#8192e3;font-size:124px;line-height:124px;font-weight:650;letter-spacing:-.05em">Evolutions</div>
+    <div class="row" style="left:0;top:180px;transform:translateX(-50%);gap:16px;font-size:56px;font-weight:600;letter-spacing:-.025em"><span id="g1" style="color:#fff">Search,</span><span id="g2" style="color:#8192e3">evolved.</span></div>
+  </div>
+  <div class="L" id="Lcta">
+    <div class="a" style="left:-390px;top:70px;width:100px;height:100px;border-radius:30px;background:#8192e3"><div class="a" id="icS2" style="left:22px;top:22px"></div></div>
+    <div class="a" style="left:-266px;top:72px;color:#fff;font-size:50px;font-weight:650;letter-spacing:-.035em;white-space:nowrap">Marvant Evolutions</div>
+    <div class="a" style="left:-266px;top:136px;color:#8A8782;font-size:32px;font-weight:500;white-space:nowrap">Search, evolved.</div>
+    <div class="a" style="left:-390px;top:236px;width:780px;height:2px;background:#222"></div>
+    <div class="row" id="btn" style="left:-390px;top:330px;width:780px;height:150px;border-radius:75px;background:#8192e3;color:#fff;font-size:50px;font-weight:650;letter-spacing:-.025em;justify-content:center;gap:20px">Book your strategy call<span id="icA"></span></div>
+    <div class="a mono" id="url" style="left:-390px;top:570px;width:780px;text-align:center;color:#fff;font-size:80px;line-height:96px;white-space:nowrap"><span id="urlT"></span></div>
+    <div class="a" id="ul" style="top:684px;height:7px;border-radius:4px;background:#8192e3"></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const P='#8192e3';
+$('icS').innerHTML=M.icon('sparkle',80,'#fff',4); $('icS2').innerHTML=M.icon('sparkle',56,'#fff',3.6); $('icA').innerHTML=M.icon('arrow',48,'#fff',3.4);
+// clip-local word times: Marvant 0, Evolutions 0.49, search 1.63, evolved 2.07, book 3.17, strategy 3.76, call 4.29, marvant.com 4.76
+const URL='marvant.com';
+const fade=(el,v,dy=0)=>{el.style.opacity=v.o.toFixed(4); el.style.filter=v.blur>0.05?`blur(${v.blur.toFixed(2)}px)`:'none'; el.style.transform=`translateY(${((1-v.a)*dy).toFixed(2)}px)`;};
+const bp=M.track(0,[[4.22,1,[45,1]],[4.33,0,[22,.72]]]);
+const btnIn=M.track(0,[[3.25,1,[16,0.78]]]);
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:5.61,intro:null,camSpring:M.MORPH,
+  SH:{prev:{w:820,h:520,r:60,bg:'#8192e3',cam:1.1}, logo:{w:860,h:720,r:60,bg:'#0B0B0B',cam:1.05}, cta:{w:900,h:900,r:56,bg:'#0B0B0B',cam:1.0}},
+  start:'prev', SEQ:[[0.0,'logo'],[3.17,'cta']],
+  layers:[
+    {el:'Llogo',tin:0.0,tout:3.17,o:{din:0.05},update:(t)=>{
+      const s=M.S(t-0.05,15,0.75); $('tile').style.transform=`scale(${Math.max(0,s).toFixed(4)})`;
+      fade($('w1'),M.vis(t,0.0,null,{din:0.05}),20); fade($('w2'),M.vis(t,0.49,null,{din:0}),20);
+      fade($('g1'),M.vis(t,1.63,null,{din:0})); fade($('g2'),M.vis(t,2.07,null,{din:0}));
+    }},
+    {el:'Lcta',tin:3.17,tout:null,anchor:'t',update:(t)=>{
+      const b=Math.max(0,btnIn(t)); $('btn').style.transform=`scale(${(0.9+0.1*b)*(1-0.05*bp(t))})`; $('btn').style.opacity=M.clamp(b*1.5);
+      $('icA').style.transform=`translateX(${10*Math.sin(Math.PI*M.clamp((t-4.29)/0.35))}px)`;
+      const n=Math.round(M.clamp((t-4.76)/0.35)*URL.length); M.setText($('urlT'),URL.slice(0,n)||' ');
+      const u=M.eio((t-5.0)/0.4), ut=$('urlT'); Object.assign($('ul').style,{left:(-390+ut.offsetLeft)+'px',width:(ut.offsetWidth*u)+'px'});
+    }},
+  ],
+  cursor:{size:54,clicks:[4.29],keys:[[0,400,520],[3.45,400,520],[4.12,70,-30],[4.45,70,-30],[5.1,360,330]]},
+  extra:(t)=>{$('cursor').style.opacity=M.clamp((t-3.3)/0.2);},
+});
+</script>

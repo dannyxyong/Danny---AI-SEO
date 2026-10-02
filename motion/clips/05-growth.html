@@ -1,0 +1,68 @@
+<title>05 Rankings and traffic</title>
+<style>
+.mut{color:#8A8782}
+.tab{position:absolute;top:0;width:300px;height:88px;line-height:88px;text-align:center;color:#fff;font-size:32px;font-weight:600}
+.gl{position:absolute;left:-380px;width:760px;height:2px;background:#EFEDE9}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lchart">
+    <div class="a" style="left:-300px;top:50px;width:600px;height:88px;border-radius:44px;background:#F1EFEB"></div>
+    <div class="a" id="ind" style="top:56px;height:76px;border-radius:38px;background:#0B0B0B"></div>
+    <div class="a blend" style="left:-300px;top:50px;width:600px;height:88px"><div class="tab" style="left:0">Rankings</div><div class="tab" style="left:300px">Traffic</div></div>
+    <div class="a" id="t1" style="left:-380px;top:180px;font-size:48px;font-weight:650;letter-spacing:-.03em;white-space:nowrap">Google rankings</div>
+    <div class="a" id="t2" style="left:-380px;top:180px;font-size:48px;font-weight:650;letter-spacing:-.03em;white-space:nowrap">Organic traffic</div>
+    <div class="a mut" style="left:-380px;top:256px;font-size:24px;font-weight:500">Higher ↑</div>
+    <div class="gl" style="top:330px"></div><div class="gl" style="top:490px"></div><div class="gl" style="top:650px"></div><div class="gl" style="top:810px"></div>
+    <div class="a" style="left:-380px;top:970px;width:760px;height:2px;background:#DCD8D1"></div>
+    <div class="a mut" style="left:180px;top:990px;width:200px;text-align:right;font-size:24px;font-weight:500">Time →</div>
+    <svg class="a" style="left:-380px;top:330px" width="760" height="640" viewBox="0 0 760 640">
+      <path id="area" fill="#8192e3" fill-opacity="0.16" d=""/>
+      <path id="line" fill="none" stroke="#0B0B0B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d=""/>
+      <circle id="dot" r="14" fill="#8192e3" stroke="#fff" stroke-width="5"/>
+    </svg>
+    <div class="row" id="tip" style="left:0;top:0;height:64px;padding:0 24px;border-radius:32px;background:#0B0B0B;color:#fff;font-size:30px;font-weight:600;gap:10px"><span id="tipT">Rankings</span><span id="icU"></span></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const P='#8192e3';
+// clip-local word times: higher 0, Google 0.33, rankings 0.67, traffic 1.40, keeps 1.94, compounding 2.19
+// curve shapes are illustrative: no axis values, no real data
+const RK=[.10,.16,.14,.27,.34,.31,.47,.56,.68,.76,.90], TF=[.03,.05,.07,.09,.13,.17,.23,.31,.43,.61,.88], N=RK.length;
+const X=i=>i*760/(N-1), Y=v=>620-v*600;
+const k=M.track(0,[[1.40,1,M.MORPH]]);
+const iL=M.track(4,[[1.40,304,M.SLOW]]), iR=M.track(296,[[1.40,596,M.FAST]]);
+const tipS=M.track(0,[[0.67,1,[16,0.72]],[1.40,0,M.FAST],[2.19,1,[16,0.72]]]);
+const pts=(t)=>{const kk=M.clamp(k(t)); const dr=M.eio((t-0.1)/0.75), dt=0.72+0.28*M.eio((t-1.94)/0.55); const D=M.lerp(dr,dt,kk);
+  const f=D*(N-1), n=Math.floor(f), out=[]; const v=i=>M.lerp(RK[i],TF[i],kk);
+  for(let i=0;i<=Math.min(n,N-1);i++) out.push([X(i),Y(v(i))]);
+  if(n<N-1&&f>n){const u=f-n; out.push([M.lerp(X(n),X(n+1),u),M.lerp(Y(v(n)),Y(v(n+1)),u)]);}
+  return out;};
+const smooth=p=>{if(p.length<2) return p.length?`M${p[0][0]},${p[0][1]}`:''; let d=`M${p[0][0].toFixed(1)},${p[0][1].toFixed(1)}`;
+  for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;
+    d+=` C${(b[0]+(c[0]-a[0])/6).toFixed(1)},${(b[1]+(c[1]-a[1])/6).toFixed(1)} ${(c[0]-(e[0]-b[0])/6).toFixed(1)},${(c[1]-(e[1]-b[1])/6).toFixed(1)} ${c[0].toFixed(1)},${c[1].toFixed(1)}`;}
+  return d;};
+$('icU').innerHTML=M.icon('arrow',30,P,3); $('icU').style.transform='rotate(-90deg)';
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:2.80,intro:null,camSpring:M.MORPH,
+  SH:{prev:{w:520,h:140,r:70,bg:'#0B0B0B',cam:1.5}, chart:{w:900,h:1160,r:48,bg:'#FFFFFF',cam:1.0}},
+  start:'prev', SEQ:[[0.0,'chart']],
+  layers:[
+    {el:'Lchart',tin:0.0,tout:2.68,anchor:'t',o:{lout:0.1},update:(t)=>{
+      const L=iL(t),R=iR(t); Object.assign($('ind').style,{left:(-300+L)+'px',width:(R-L)+'px'});
+      const a=M.vis(t,null,1.40,{lout:0.12}), b=M.vis(t,1.40,null,{din:0.06,lin:0.22});
+      $('t1').style.opacity=a.o; $('t1').style.filter=a.blur>0.05?`blur(${a.blur}px)`:'none';
+      $('t2').style.opacity=b.o; $('t2').style.filter=b.blur>0.05?`blur(${b.blur}px)`:'none';
+      const p=pts(t), d=smooth(p); $('line').setAttribute('d',d);
+      const last=p[p.length-1]||[0,620];
+      $('area').setAttribute('d',p.length>1?d+` L${last[0].toFixed(1)},640 L0,640 Z`:''); $('area').style.opacity=M.clamp(k(t));
+      $('dot').setAttribute('cx',last[0]); $('dot').setAttribute('cy',last[1]); $('dot').style.opacity=t>0.15?1:0;
+      M.setText($('tipT'),t<1.6?'Rankings':'Compounding');
+      const s=Math.max(0,tipS(t)), tp=$('tip'); const tw=tp.offsetWidth;
+      tp.style.left=(-380+last[0]-tw+30)+'px'; tp.style.top=(330+last[1]-100)+'px';
+      tp.style.transform=`scale(${s.toFixed(4)})`; tp.style.transformOrigin=`${tw-30}px 100px`; tp.style.opacity=M.clamp(s*2);
+    }},
+  ],
+  cursor:{size:54,clicks:[1.40],keys:[[0,400,560],[0.6,400,560],[1.25,170,-478],[1.55,170,-478],[2.3,300,440]]},
+});
+</script>

@@ -1,0 +1,75 @@
+<title>01 8.5 billion searches</title>
+<style>
+.mut{color:#8A8782}
+.qp{position:absolute;z-index:2;width:240px;height:64px;border-radius:32px;background:#F1EFEB;display:flex;align-items:center;gap:14px;padding-left:22px;box-sizing:border-box}
+.qp i{display:block;width:120px;height:12px;border-radius:6px;background:#DCD8D1}
+.dot{width:14px;height:14px;border-radius:50%;background:#D6D3CE}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lq"><div class="row" style="left:44px;top:-26px;gap:20px;font-size:42px;font-weight:500"><span id="icQ"></span><span id="typed"></span><span id="caret" style="display:inline-block;width:3px;height:44px;background:#0B0B0B"></span></div></div>
+  <div class="L" id="Lstat">
+    <div class="row mut" style="left:-370px;top:60px;gap:14px;font-size:32px;font-weight:500"><span id="icQ2"></span>Searches on Google</div>
+    <div class="row" style="left:-374px;top:120px;align-items:baseline;gap:22px"><span id="num" style="font-size:210px;line-height:220px;font-weight:650;letter-spacing:-.055em">0.0</span><span id="bil" style="font-size:92px;font-weight:600;letter-spacing:-.03em">billion</span></div>
+    <div class="row" style="left:-370px;top:400px;gap:20px"><span id="srch" style="font-size:60px;font-weight:600;letter-spacing:-.02em">searches</span><span id="day" style="display:inline-block;background:#8192e3;color:#fff;font-size:44px;font-weight:600;border-radius:999px;padding:8px 26px">a day</span></div>
+  </div>
+  <div class="L" id="Lflow">
+    <div class="row mut" style="left:-380px;top:50px;gap:14px;font-size:30px;font-weight:500"><span id="icQ3"></span>Today's searches</div>
+    <div id="pills"></div>
+    <div class="a" id="browser" style="left:-380px;top:600px;width:760px;height:440px;border-radius:30px;border:3px solid #E2DFD9;box-sizing:border-box;background:#fff">
+      <div class="row" style="left:30px;top:24px;gap:10px"><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+      <div class="a mono" id="url" style="left:170px;top:14px;width:420px;height:40px;border-radius:20px;background:#F1EFEB;font-size:22px;line-height:40px;text-align:center;color:#55524D">yourwebsite.com</div>
+      <div class="a" style="left:0;top:68px;width:754px;height:2px;background:#EAE7E2"></div>
+      <div class="a mut" style="left:40px;top:320px;font-size:28px;font-weight:500">Visitors from search</div>
+      <div class="a" style="left:40px;top:370px;width:674px;height:20px;border-radius:10px;background:#EDEAE5"></div>
+      <div class="a" id="vfill" style="left:40px;top:370px;height:20px;border-radius:10px;background:#8192e3"></div>
+    </div>
+    <div class="row" id="notE" style="left:-170px;top:1086px;width:340px;height:84px;border-radius:42px;background:#0B0B0B;color:#fff;font-size:36px;font-weight:600;justify-content:center;gap:14px"><span id="icX"></span>Not enough</div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const P='#8192e3';
+$('icQ').innerHTML=M.icon('search',46,P,2.6); $('icQ2').innerHTML=M.icon('search',32,'#8A8782'); $('icQ3').innerHTML=M.icon('search',30,'#8A8782'); $('icX').innerHTML=M.icon('x',32,P,3.2);
+const Q='ai seo services';
+// 12 search pills; #7 is the one that reaches the website
+const COLS=[-380,-120,140], ROWS=[130,214,298,382], WIN=7, PL=[];
+let h=''; ROWS.forEach((y,r)=>COLS.forEach((x,c)=>{const i=PL.length; PL.push([x,y]); h+=`<div class="qp" id="p${i}" style="left:0;top:0"><span class="ic"></span><i></i></div>`;}));
+$('pills').innerHTML=h; PL.forEach((_,i)=>$('p'+i).querySelector('.ic').innerHTML=M.icon('search',24,'#8A8782'));
+const TIN=i=>3.13+0.035*i, TGO=i=>3.78+0.025*i;
+const bar=M.track(0,[[4.37,0.07,[11,0.9]]]);
+const nb=M.track(0,[[5.8,1,[17,0.72]]]);
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:6.93,intro:0.05,
+  SH:{q:{w:640,h:120,r:60,bg:'#FFFFFF',cam:1.35}, stat:{w:860,h:540,r:48,bg:'#FFFFFF',cam:1.05}, flow:{w:880,h:1220,r:48,bg:'#FFFFFF',cam:1.0}},
+  start:'q', SEQ:[[0.92,'stat'],[2.93,'flow']],
+  layers:[
+    {el:'Lq',tin:0.05,tout:0.92,anchor:'l',o:{din:0.02},update:(t)=>{
+      const n=Math.round(M.clamp((t-0.2)/0.5)*Q.length); M.setText($('typed'),Q.slice(0,n));
+      $('caret').style.opacity=(t<0.75||Math.floor(t*3)%2==0)?1:0;
+    }},
+    {el:'Lstat',tin:0.92,tout:2.93,anchor:'t',update:(t)=>{
+      M.setText($('num'),(8.5*M.eo((t-0.99)/0.55)).toFixed(1));
+      const b=M.vis(t,1.19,null,{din:0,lin:0.22}); M.apply($('bil'),b);
+      const s=M.vis(t,1.71,null,{din:0,lin:0.22}); M.apply($('srch'),s);
+      const d=M.S(t-2.44,16,0.7); const de=$('day').style; de.opacity=t<2.44?0:1; de.transform=`scale(${Math.max(0,d).toFixed(4)})`;
+    }},
+    {el:'Lflow',tin:2.93,tout:6.72,anchor:'t',o:{lout:0.15},update:(t)=>{
+      PL.forEach(([x,y],i)=>{
+        const el=$('p'+i), a=M.S(t-TIN(i),18,0.8);
+        const go=i===WIN?M.eio((t-3.86)/0.5):M.eio((t-TGO(i))/0.6);
+        let tx=x, ty=y, sc=Math.max(0,a), o=t<TIN(i)?0:M.clamp(a*1.4);
+        if(i===WIN){tx=M.lerp(x,-120,go); ty=M.lerp(y,830,go); sc*=1+0.12*Math.sin(Math.PI*go);}
+        else{const cx=x+120, dir=cx===0?(i%2?1:-1):Math.sign(cx); tx=x+dir*50*go; ty=y+30*go; sc*=1-0.1*go; o*=1-0.72*go;}
+        el.style.transform=`translate(${tx}px,${ty}px) scale(${sc.toFixed(4)})`; el.style.opacity=o.toFixed(4);
+        if(i===WIN){const k=M.clamp((t-3.8)/0.25); el.style.background=k>0.5?P:'#F1EFEB'; el.querySelector('i').style.background=k>0.5?'rgba(255,255,255,.6)':'#DCD8D1'; el.querySelector('.ic').style.opacity=k>0.5?0:1;}
+      });
+      const bv=M.vis(t,3.38,null,{din:0,lin:0.25}); M.apply($('browser'),bv);
+      const on=M.clamp((t-4.37)/0.2); $('browser').style.borderColor=on>0.5?P:'#E2DFD9';
+      $('url').style.background=on>0.5?P:'#F1EFEB'; $('url').style.color=on>0.5?'#fff':'#55524D';
+      $('vfill').style.width=(674*Math.max(0,bar(t)))+'px';
+      const n=nb(t), ne=$('notE').style; ne.opacity=t<5.8?0:1; ne.transform=`scale(${Math.max(0,n).toFixed(4)})`;
+      $('icX').style.transform=`scale(${1+0.3*Math.sin(Math.PI*M.clamp((t-6.15)/0.3))})`;
+    }},
+  ],
+});
+</script>

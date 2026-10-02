@@ -1,0 +1,31 @@
+<title>02 Meet AI SEO</title>
+<div data-slot="shape">
+  <div class="L" id="Lchip"><div class="row" style="transform:translate(-50%,-50%);gap:20px;color:#fff;font-size:64px;font-weight:650;letter-spacing:-.03em"><span id="icS"></span><span id="ai">AI</span><span id="seo">SEO</span></div></div>
+  <div class="L" id="Lbrand">
+    <div class="a" style="left:-70px;top:-210px;width:140px;height:140px;border-radius:40px;background:#8192e3"><div class="a" id="icS2" style="left:30px;top:30px"></div></div>
+    <div class="a" style="left:-400px;top:-30px;width:800px;text-align:center;color:#fff;font-size:104px;line-height:110px;font-weight:650;letter-spacing:-.045em">AI SEO</div>
+    <div class="a" id="by" style="left:-400px;top:110px;width:800px;text-align:center;font-size:44px;font-weight:500;color:#9A9791;white-space:nowrap">by <span id="nm" style="color:#fff">Marvant Evolutions</span></div>
+    <div class="a" id="ul" style="top:178px;height:6px;border-radius:3px;background:#8192e3"></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const fade=(el,v)=>{el.style.opacity=v.o.toFixed(4); el.style.filter=v.blur>0.05?`blur(${v.blur.toFixed(2)}px)`:'none';};
+$('icS').innerHTML=M.icon('sparkle',56,'#8192e3'); $('icS2').innerHTML=M.icon('sparkle',80,'#fff',4);
+// clip-local word times: meet 0.00, AI 0.47, SEO 0.75, by 1.12, Marvant 1.40, Evolutions 2.15
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:3.80,intro:null,
+  SH:{prev:{w:880,h:1220,r:48,bg:'#FFFFFF',cam:1.0}, chip:{w:470,h:140,r:70,bg:'#0B0B0B',cam:1.5}, brand:{w:820,h:600,r:60,bg:'#0B0B0B',cam:1.05}}, camSpring:M.MORPH,
+  start:'prev', SEQ:[[0.02,'chip'],[1.40,'brand']],
+  layers:[
+    {el:'Lchip',tin:0.2,tout:1.40,o:{din:0},update:(t)=>{
+      fade($('ai'),M.vis(t,0.47,null,{din:0,lin:0.2})); fade($('seo'),M.vis(t,0.75,null,{din:0,lin:0.2}));
+      const s=M.S(t-0.25,16,0.72); $('icS').style.transform=`scale(${Math.max(0,s).toFixed(4)}) rotate(${(1-M.clamp(s))*-90}deg)`;
+    }},
+    {el:'Lbrand',tin:1.40,tout:3.62,o:{lout:0.15},update:(t)=>{
+      M.apply($('by'),M.vis(t,1.5,null,{din:0,lin:0.24}));
+      const nm=$('nm'), u=M.eio((t-2.15)/0.45); Object.assign($('ul').style,{left:(-400+nm.offsetLeft)+'px',width:(nm.offsetWidth*u)+'px'});
+    }},
+  ],
+});
+</script>

@@ -1,0 +1,62 @@
+<title>04 Content terminal</title>
+<style>
+.tm{color:#EDEBE7}
+.dm{color:#7C7973}
+.ck{position:absolute;left:-410px;display:flex;align-items:center;gap:18px;font-size:32px;white-space:nowrap}
+.ck .bx{width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.sl{position:absolute;left:-410px;height:14px;border-radius:7px;background:#3A3A3A}
+.dot{width:14px;height:14px;border-radius:50%;background:#333}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lterm">
+    <div class="row" style="left:-410px;top:36px;gap:10px"><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+    <div class="a mono dm" style="left:-250px;top:30px;width:500px;text-align:center;font-size:22px">marvant — ai-seo</div>
+    <div class="a" style="left:-460px;top:84px;width:920px;height:2px;background:#1F1F1F"></div>
+    <div class="a mono tm" style="left:-410px;top:120px;font-size:30px;white-space:nowrap"><span style="color:#8192e3">$&nbsp;</span><span id="typed"></span><span id="caret" style="display:inline-block;width:14px;height:32px;background:#EDEBE7;vertical-align:-5px;margin-left:2px"></span></div>
+    <div class="a mono dm" id="lab1" style="left:-410px;top:204px;font-size:27px">› engineering to rank</div>
+    <div class="ck mono tm" id="c0" style="top:252px"><span class="bx"></span>search intent mapped</div>
+    <div class="ck mono tm" id="c1" style="top:314px"><span class="bx"></span>title + meta written</div>
+    <div class="ck mono tm" id="c2" style="top:376px"><span class="bx"></span>heading structure built</div>
+    <div class="ck mono tm" id="c3" style="top:438px"><span class="bx"></span>FAQ + schema added</div>
+    <div class="a mono dm" id="lab2" style="left:-410px;top:528px;font-size:27px;width:820px">› writing draft<span id="pct" style="position:absolute;right:0">0%</span></div>
+    <div class="a" id="trk" style="left:-410px;top:580px;width:820px;height:14px;border-radius:7px;background:#262626"><div class="a" id="pf" style="left:0;top:0;height:14px;border-radius:7px;background:#8192e3"></div></div>
+    <div id="sk"></div>
+    <div class="row mono" id="done" style="left:-410px;top:1110px;gap:16px;font-size:32px;color:#8192e3"><span id="icD"></span>draft ready · machine speed</div>
+  </div>
+  <div class="L" id="Lmini"><div class="row" style="transform:translate(-50%,-50%);gap:18px;color:#fff;font-size:52px;font-weight:650;letter-spacing:-.03em">The result<span id="icA"></span></div></div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const P='#8192e3';
+$('icD').innerHTML=M.icon('check',34,P,3); $('icA').innerHTML=M.icon('arrow',48,P,3);
+// clip-local word times: intelligent 0, engineered 0.96, rank 1.64, written 2.11, machine 2.69, speed 3.11, result 3.63
+// the command and its output are illustrative
+const CMD='marvant write --kw "ai seo agency"';
+const CT=[0.96,1.22,1.49,1.64];
+const SW=[780,820,700,800,560,790,740,810,620,450];
+$('sk').innerHTML=SW.map((w,k)=>`<div class="sl" id="s${k}" style="top:${650+k*44}px"></div>`).join('');
+const ST=k=>2.25+0.085*k;
+M.scene({
+  W:1080,H:1920,bg:'#E9E7E2',T:4.24,intro:null,camSpring:M.MORPH,
+  SH:{prev:{w:900,h:1240,r:48,bg:'#FFFFFF',cam:1.0}, term:{w:920,h:1240,r:44,bg:'#0B0B0B',cam:1.0}, mini:{w:520,h:140,r:70,bg:'#0B0B0B',cam:1.5}},
+  start:'prev', SEQ:[[0.02,'term'],[3.63,'mini']],
+  layers:[
+    {el:'Lterm',tin:0.02,tout:3.63,anchor:'t',o:{din:0.02,lin:0.18},update:(t)=>{
+      const n=Math.round(M.clamp((t-0.08)/0.7)*CMD.length); M.setText($('typed'),CMD.slice(0,n));
+      $('caret').style.opacity=t<0.85?1:0;
+      const l1=M.vis(t,0.9,null,{din:0,lin:0.2}); $('lab1').style.opacity=l1.o;
+      CT.forEach((c,j)=>{
+        const e=$('c'+j), v=M.vis(t,c-0.12,null,{din:0,lin:0.18}); e.style.opacity=v.o; e.style.transform=`translateX(${(1-v.a)*-16}px)`;
+        const bx=e.querySelector('.bx'), on=t>=c;
+        if(bx._on!==on){bx._on=on; bx.innerHTML=on?M.icon('check',32,P,3.2):M.icon('clock',30,'#7C7973');}
+        bx.style.transform=`scale(${on?1+0.25*Math.sin(Math.PI*M.clamp((t-c)/0.25)):1})`;
+      });
+      const l2=M.vis(t,2.11,null,{din:0,lin:0.2}); $('lab2').style.opacity=l2.o; $('trk').style.opacity=l2.o;
+      const p=M.clamp((t-2.15)/0.96); $('pf').style.width=(820*M.eio(p))+'px'; M.setText($('pct'),Math.round(100*M.eio(p))+'%');
+      SW.forEach((w,k)=>{$('s'+k).style.width=(w*M.eo((t-ST(k))/0.22))+'px';});
+      const d=M.vis(t,3.11,null,{din:0,lin:0.2}); $('done').style.opacity=d.o; $('done').style.filter=d.blur>0.05?`blur(${d.blur}px)`:'none';
+    }},
+    {el:'Lmini',tin:3.63,tout:null,o:{din:0.1}},
+  ],
+});
+</script>
