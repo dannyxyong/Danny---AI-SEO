@@ -1,0 +1,366 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Marvant Evolutions — 15s Reel</title>
+<style>
+@font-face{font-family:P;src:url(fonts/Poppins-300.ttf);font-weight:300}
+@font-face{font-family:P;src:url(fonts/Poppins-400.ttf);font-weight:400}
+@font-face{font-family:P;src:url(fonts/Poppins-500.ttf);font-weight:500}
+@font-face{font-family:P;src:url(fonts/Poppins-600.ttf);font-weight:600}
+@font-face{font-family:P;src:url(fonts/Poppins-700.ttf);font-weight:700}
+@font-face{font-family:P;src:url(fonts/Poppins-800.ttf);font-weight:800}
+@font-face{font-family:P;src:url(fonts/Poppins-900.ttf);font-weight:900}
+@font-face{font-family:L;src:url(fonts/Lato-400.ttf);font-weight:400}
+@font-face{font-family:L;src:url(fonts/Lato-700.ttf);font-weight:700}
+:root{--ink:#231f20;--p1:#7f92e2;--p2:#aab3ef;--t:#80e0e0;--mist:#f5f6fb}
+html,body{margin:0;padding:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#0c0a0e;font-family:P,sans-serif;color:#fff}
+.a{position:absolute;left:0;top:0;transform-origin:50% 50%}
+.grad-text{background:linear-gradient(90deg,#aab3ef 0%,#7f92e2 45%,#80e0e0 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ln{overflow:hidden;padding:0 .06em .14em;white-space:nowrap}
+.ln>.in{display:block;will-change:auto}
+.mono{font-family:P;font-weight:600;letter-spacing:.32em;text-transform:uppercase}
+.hl{font-weight:800;font-size:84px;line-height:1.05;letter-spacing:-.025em}
+/* scroll rows */
+.row{font-weight:900;font-size:180px;line-height:1;letter-spacing:-.03em;color:transparent;-webkit-text-stroke:2.5px rgba(255,255,255,.9);white-space:nowrap}
+/* card */
+.card{position:absolute;left:50%;top:50%;width:520px;height:660px;margin:-330px 0 0 -260px;color:var(--ink)}
+.card .hd{position:absolute;left:24px;top:22px;display:flex;align-items:center;gap:14px}
+.card .av{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#aab3ef,#7f92e2 50%,#80e0e0)}
+.card .nm{font-weight:700;font-size:24px;line-height:1.1}
+.card .sp{font-family:L;font-size:18px;color:#8a8794}
+.card .img{position:absolute;left:24px;top:96px;width:472px;height:330px;border-radius:22px;overflow:hidden}
+.card .bar{position:absolute;left:24px;height:18px;border-radius:9px;background:#dfe2f0}
+.card .btn{position:absolute;left:24px;top:556px;width:472px;height:76px;border-radius:20px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:14px;font-weight:600;font-size:28px}
+.ghost{width:520px;height:660px;border-radius:36px;background:rgba(245,246,251,.9);border:2px solid rgba(255,255,255,.6)}
+.chip{font-weight:600;font-size:26px;padding:10px 20px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.pill{font-weight:600;font-size:32px;padding:16px 28px 16px 22px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:14px;background:rgba(28,25,34,.82);border:1.5px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.pill i{width:14px;height:14px;border-radius:50%;display:block}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.035));border:1.5px solid rgba(255,255,255,.14);border-radius:36px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.big{font-weight:800;line-height:1;letter-spacing:-.03em}
+.lbl{font-family:L;font-weight:700;font-size:28px;color:var(--p2)}
+#ig{position:absolute;inset:0;pointer-events:none;display:none}
+.show-ig #ig{display:block}
+</style></head>
+<body><div id="stage"></div>
+<script>
+const W=1080,H=1920,CX=540;
+const C={ink:'#231f20',p1:'#7f92e2',p2:'#aab3ef',t:'#80e0e0',mist:'#f5f6fb'};
+const GRAD='linear-gradient(135deg,#aab3ef 0%,#7f92e2 45%,#80e0e0 100%)';
+const stage=document.getElementById('stage');
+const $=(tag,css,parent=stage,html)=>{const e=document.createElement(tag);if(css)e.className=css;if(html!=null)e.innerHTML=html;parent.appendChild(e);return e;};
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,k)=>a+(b-a)*k;
+const E={lin:x=>x,o2:x=>1-(1-x)*(1-x),o3:x=>1-Math.pow(1-x,3),o4:x=>1-Math.pow(1-x,4),
+ expo:x=>x>=1?1:1-Math.pow(2,-10*x),i2:x=>x*x,i3:x=>x*x*x,io3:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+ ioexpo:x=>x<=0?0:x>=1?1:x<.5?Math.pow(2,20*x-10)/2:(2-Math.pow(2,-20*x+10))/2,
+ back:x=>{const s=1.70158;return 1+(s+1)*Math.pow(x-1,3)+s*Math.pow(x-1,2)}};
+const P=(t,a,b,e=E.lin)=>e(clamp((t-a)/(b-a)));
+function spring(dt,w=16,z=.55){if(dt<=0)return 0;const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*dt)*(Math.cos(wd*dt)+(z*w/wd)*Math.sin(wd*dt));}
+const S=(t,t0,w,z)=>spring(t-t0,w,z);
+function K(t,keys){if(t<=keys[0][0])return keys[0][1];for(let i=1;i<keys.length;i++){const[t1,v1,e]=keys[i];if(t<=t1){const[t0,v0]=keys[i-1];return lerp(v0,v1,(e||E.io3)((t-t0)/(t1-t0)));}}return keys[keys.length-1][1];}
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mix=(a,b,k)=>{const A=hex(a),B=hex(b);return`rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],k))).join(',')})`;};
+function T(e,x,y,o={}){const s=o.s??1,sx=(o.sx??1)*s,sy=(o.sy??1)*s,r=o.r??0,op=o.o??1,b=o.b??0;
+ e.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)${o.rx?` perspective(1400px) rotateX(${o.rx}deg)`:''}${r?` rotate(${r}deg)`:''}${o.sk?` skewY(${o.sk}deg)`:''} scale(${sx},${sy})`;
+ e.style.opacity=clamp(op);e.style.filter=b>.05?`blur(${b}px)`:'none';e.style.visibility=op<=0.001?'hidden':'visible';}
+// masked line: reveal from below, exit upward
+function lineIn(L,t,tin,tout,{dur=.6,out=.4}={}){const k=P(t,tin,tin+dur,E.expo);const q=tout==null?0:P(t,tout,tout+out,E.i3);
+ L.in.style.transform=`translateY(${(1-k)*112-q*112}%)`;L.in.style.filter=(q>0.02||k<.98)?`blur(${(1-k)*6+q*8}px)`:'none';
+ L.el.style.visibility=(k<=0||q>=1)?'hidden':'visible';}
+function mkLine(html,cls,x,y){const el=$('div','a ln '+(cls||''));const inn=$('div','in',el,html);el.dataset.x=x;el.dataset.y=y;return{el,in:inn,x,y};}
+function place(L,x,y,o){T(L.el,x??L.x,y??L.y,o);}
+
+/* ================= BACKGROUND ================= */
+const bg=$('div','a');bg.style.cssText='width:1080px;height:1920px;';
+const orbs=[[C.p1,820],[C.t,760],[C.p2,560]].map(([c,r])=>{const o=$('div','a',bg);o.style.cssText+=`width:${r*2}px;height:${r*2}px;border-radius:50%;background:radial-gradient(circle,${c}cc 0%,${c}55 30%,${c}00 68%)`;return o;});
+const grid=$('div','a',bg);grid.style.cssText+='width:1080px;height:2100px;background-image:linear-gradient(rgba(255,255,255,.055) 1.5px,transparent 1.5px),linear-gradient(90deg,rgba(255,255,255,.055) 1.5px,transparent 1.5px);background-size:72px 72px;-webkit-mask-image:radial-gradient(ellipse 70% 55% at 50% 48%,#000 20%,transparent 75%)';
+const vig=$('div','a');vig.style.cssText='width:1080px;height:1920px;background:radial-gradient(ellipse 85% 70% at 50% 46%,transparent 55%,rgba(0,0,0,.55) 100%);z-index:40;pointer-events:none';
+const grain=$('div','a');grain.style.cssText='width:1080px;height:1920px;z-index:41;opacity:.085;mix-blend-mode:overlay;pointer-events:none';
+(()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const d=g.createImageData(256,256);let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+ for(let i=0;i<d.data.length;i+=4){const v=rnd()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}g.putImageData(d,0,0);grain.style.backgroundImage=`url(${c.toDataURL()})`;})();
+
+/* world wrapper: gentle camera */
+const world=$('div','a');world.style.cssText='width:1080px;height:1920px;transform-origin:540px 880px';
+
+/* ================= SCENE 1 : HOOK ================= */
+const rows=[];for(let i=-3;i<=16;i++){const r=$('div','a row',world,'SCROLL');rows.push({i,el:r});}
+const stopG=$('div','a',world);stopG.style.cssText='width:1px;height:1px';
+const stopTxt=$('div','a row',stopG,'STOP');stopTxt.style.cssText+='color:#fff;-webkit-text-stroke:0;left:0;top:0';
+const ripple=$('div','a',world);ripple.style.cssText='width:100px;height:100px;border-radius:50%;border:5px solid rgba(255,255,255,.9)';
+const s1sub=mkLine('Most ads get <span class="grad-text" style="font-weight:700">scrolled past.</span>','',CX,1150);s1sub.el.style.cssText+='font-weight:500;font-size:52px;color:#fff';world.appendChild(s1sub.el);
+
+/* ================= SCENE 2 : EVOLVE ================= */
+const s2h=[mkLine("We don't",'hl',CX,385),mkLine('just run ads.','hl',CX,480),mkLine('We <span class="grad-text">evolve</span>','hl',CX,385),mkLine('them.','hl',CX,480)];
+s2h.forEach(l=>world.appendChild(l.el));
+const ghosts=[0,1,2,3].map(()=>{const g=$('div','a ghost',world);return g;});
+const SOFA=`<svg viewBox="0 0 472 330" width="472" height="330"><defs><linearGradient id="IG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#aab3ef"/><stop offset=".55" stop-color="#7f92e2"/><stop offset="1" stop-color="#80e0e0"/></linearGradient></defs>
+<rect width="472" height="330" fill="url(#IG)"/><circle cx="380" cy="80" r="44" fill="#fff" opacity=".35"/>
+<g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M110 230 v-62 a26 26 0 0 1 26-26 h200 a26 26 0 0 1 26 26 v62"/><path d="M92 200 a22 22 0 0 1 36 0 v44 h216 v-44 a22 22 0 0 1 36 0 v62 h-288 z"/><path d="M118 262 v18 M354 262 v18"/><path d="M236 142 v100"/></g>
+<g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"><path d="M70 100 h40 l-12 34 h-16 z"/><path d="M90 134 v130"/></g></svg>`;
+const SOFA_B=SOFA.replace(/IG/g,'IGB').replace('#aab3ef','#80e0e0').replace('stop-color="#80e0e0"/></linearGradient>','stop-color="#aab3ef"/></linearGradient>');
+function mkCard(parent,img,cta){const c=$('div','card',parent);
+ c.innerHTML=`<div class="hd"><div class="av"></div><div><div class="nm">Your Brand</div><div class="sp">Sponsored</div></div></div><div class="img">${img}</div><div class="bar" style="top:448px;width:400px"></div><div class="bar" style="top:482px;width:290px"></div><div class="bar" style="top:516px;width:200px;opacity:.6"></div><div class="btn">${cta}<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>`;
+ return{root:c,parts:[...c.children]};}
+const cardA=$('div','a',world);cardA.style.cssText='width:520px;height:660px;border-radius:36px;background:#f5f6fb;overflow:hidden';
+const cA=mkCard(cardA,SOFA_B,'Shop now');
+const abLbl=['A','B'].map(s=>{const e=$('div','a chip',world,s);e.style.cssText+='font-size:28px;font-weight:700;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);padding:8px 22px';return e;});
+const mChips=[['CTR','▼',0],['CPL','▲',0],['CTR','▲',1],['CPL','▼',1]].map(([k,a,win])=>{const e=$('div','a chip',world,`${k} <b style="font-size:22px">${a}</b>`);
+ e.style.cssText+=win?'background:rgba(128,224,224,.16);color:#80e0e0;border:1.5px solid rgba(128,224,224,.5)':'background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);border:1.5px solid rgba(255,255,255,.14)';return e;});
+const check=$('div','a',world,'<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#231f20" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>');
+check.style.cssText+='width:76px;height:76px;border-radius:50%;background:#80e0e0;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(128,224,224,.6)';
+const stepper=$('div','a',world);stepper.style.cssText='width:600px;height:72px';
+const stepPill=$('div','a',stepper);stepPill.style.cssText='height:62px;border-radius:31px;background:#fff';
+const stepWords=['TEST','LEARN','SCALE'].map((w,i)=>{const e=$('div','a mono',stepper,w);e.style.cssText+='font-size:26px;letter-spacing:.22em;';return e;});
+const stepSeps=[0,1].map(()=>$('div','a',stepper,'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="3" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>'));
+
+/* ================= SCENE 3 : PLATFORMS ================= */
+const s3eb=mkLine('Full-funnel performance','mono',CX,322);s3eb.el.style.cssText+='font-size:26px;color:#80e0e0';
+const s3h=[mkLine('Every platform.','hl',CX,410),mkLine('One <span class="grad-text">growth engine.</span>','hl',CX,505)];
+[s3eb,...s3h].forEach(l=>world.appendChild(l.el));
+const s3svg=document.createElementNS('http://www.w3.org/2000/svg','svg');s3svg.setAttribute('width',1080);s3svg.setAttribute('height',1920);s3svg.classList.add('a');s3svg.style.transform='none';world.appendChild(s3svg);
+s3svg.innerHTML=`<defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#aab3ef"/><stop offset="1" stop-color="#80e0e0"/></linearGradient></defs>
+<g id="rings" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"><ellipse id="rT" cx="540" cy="735" rx="300" ry="74"/><ellipse id="rB" cx="540" cy="1115" rx="300" ry="74"/></g>
+<g id="spokes" stroke="url(#lg)" stroke-width="2.5" opacity=".55"></g>
+<circle id="dash1" cx="540" cy="920" r="150" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2.5" stroke-dasharray="4 14"/>
+<circle id="dash2" cx="540" cy="920" r="186" fill="none" stroke="rgba(128,224,224,.25)" stroke-width="1.5"/>`;
+const spokes=[];for(let i=0;i<8;i++){const l=document.createElementNS('http://www.w3.org/2000/svg','line');s3svg.querySelector('#spokes').appendChild(l);spokes.push(l);}
+const PLAT=[['Meta Ads',C.p1],['Google Ads',C.t],['TikTok Ads',C.p2],['LinkedIn Ads',C.p1],['XHS Ads',C.t],['SEO',C.p2],['Web + CRO',C.p1],['Content',C.t]];
+const pills=PLAT.map(([n,c])=>{const e=$('div','a pill',world,`<i style="background:${c};box-shadow:0 0 12px ${c}"></i>${n}`);return e;});
+
+/* ================= HERO (the one shape that never cuts) ================= */
+const hero=$('div','a',world);hero.style.cssText='width:46px;height:46px;border-radius:23px;background:#f5f6fb;overflow:hidden';
+const heroGrad=$('div','a',hero);heroGrad.style.cssText=`width:100%;height:100%;background:${GRAD};transform:none`;
+const cB=mkCard(hero,SOFA,'Learn more');
+const MSVG=s=>`<svg viewBox="-100 -100 200 200" width="${s}" height="${s}"><path class="mpath" d="M-52 48 V-46 L0 14 L52 -46 V48" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const heroM=$('div','a',hero,MSVG(200));heroM.style.cssText+='left:50%;top:50%;width:200px;height:200px';
+const mPath=heroM.querySelector('.mpath');const mLen=mPath.getTotalLength();mPath.style.strokeDasharray=mLen;
+const shine=$('div','a',hero);shine.style.cssText='width:120px;height:600px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)';
+
+/* ================= SCENE 4 : PROOF ================= */
+const s4eb=mkLine('Client results','mono',CX,322);s4eb.el.style.cssText+='font-size:26px;color:#80e0e0';
+const s4h=[mkLine('Results you','hl',CX,410),mkLine('can <span class="grad-text">count.</span>','hl',CX,505)];
+[s4eb,...s4h].forEach(l=>world.appendChild(l.el));
+const bigC=$('div','a glass',world);bigC.style.cssText+='width:820px;height:430px';
+bigC.innerHTML=`<div style="position:absolute;left:40px;top:38px" class="lbl">Bookings</div>
+<div style="position:absolute;right:34px;top:30px" class="chip"><span style="font-size:22px;letter-spacing:.14em;color:rgba(255,255,255,.7);font-weight:600">EVERKITCHEN</span></div>
+<div id="n40" class="big grad-text" style="position:absolute;left:34px;top:78px;font-size:168px">+0%</div>
+<svg id="chart" style="position:absolute;left:0;top:0" width="820" height="430"><defs><linearGradient id="cf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#80e0e0" stop-opacity=".35"/><stop offset="1" stop-color="#80e0e0" stop-opacity="0"/></linearGradient><linearGradient id="cs" x1="0" x2="1"><stop offset="0" stop-color="#aab3ef"/><stop offset="1" stop-color="#80e0e0"/></linearGradient><clipPath id="cc"><rect id="ccr" x="0" y="0" width="0" height="430"/></clipPath></defs>
+<g clip-path="url(#cc)"><path id="carea" fill="url(#cf)"/></g><path id="cline" fill="none" stroke="url(#cs)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CH=[[40,388],[120,380],[190,384],[260,368],[330,372],[400,350],[470,352],[540,326],[610,318],[680,290],[740,272],[780,262]];
+const cl=bigC.querySelector('#cline'),ca=bigC.querySelector('#carea');
+(()=>{let d=`M${CH[0]}`;for(let i=1;i<CH.length;i++){const[a,b]=CH[i-1],[c,e]=CH[i];const m=(a+c)/2;d+=` C${m},${b} ${m},${e} ${c},${e}`;}cl.setAttribute('d',d);ca.setAttribute('d',d+` L780,430 L40,430 Z`);})();
+const clLen=cl.getTotalLength();cl.style.strokeDasharray=clLen;
+const smA=$('div','a glass',world);smA.style.cssText+='width:400px;height:300px;border-radius:32px';
+smA.innerHTML=`<div id="n30" class="big" style="position:absolute;left:32px;top:30px;font-size:104px">−0%</div><div class="lbl" style="position:absolute;left:34px;top:150px;font-size:26px">Low-quality leads</div>
+<div style="position:absolute;left:34px;top:222px;width:332px;height:20px;border-radius:10px;background:rgba(255,255,255,.1)"><div id="b30" style="height:100%;border-radius:10px;background:linear-gradient(90deg,#aab3ef,#7f92e2);width:100%"></div></div>`;
+const smB=$('div','a glass',world);smB.style.cssText+='width:400px;height:300px;border-radius:32px';
+smB.innerHTML=`<div id="n50" class="big" style="position:absolute;left:32px;top:30px;font-size:104px">0</div><div class="lbl" style="position:absolute;left:34px;top:150px;font-size:26px">Home &amp; living brands</div><div id="dots" style="position:absolute;left:34px;top:204px;width:340px;display:grid;grid-template-columns:repeat(13,1fr);row-gap:9px"></div>`;
+const dotsEl=[];for(let i=0;i<52;i++){const d=$('div','',smB.querySelector('#dots'));d.style.cssText='width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.12)';dotsEl.push(d);}
+const n40=bigC.querySelector('#n40'),n30=smA.querySelector('#n30'),b30=smA.querySelector('#b30'),n50=smB.querySelector('#n50'),ccr=bigC.querySelector('#ccr');
+
+/* ================= SCENE 5 : REACH ================= */
+const s5eb=mkLine('HQ · Petaling Jaya, MY','mono',CX,322);s5eb.el.style.cssText+='font-size:26px;color:#80e0e0';
+const s5h=[mkLine('Born in Malaysia.','hl',CX,410),mkLine('Scaling <span class="grad-text">across APAC.</span>','hl',CX,505)];
+[s5eb,...s5h].forEach(l=>world.appendChild(l.el));
+const HUB=[440,1060];
+const NODES=[['Seoul','KR',800,700],['Bangkok','TH',290,820],['Singapore','SG',640,1205],['Sydney','AU',820,1370]];
+const dgrid=$('div','a',world);dgrid.style.cssText='width:1080px;height:1000px;background-image:radial-gradient(circle,rgba(170,179,239,.55) 2.2px,transparent 2.6px);background-size:34px 34px';
+const s5svg=document.createElementNS('http://www.w3.org/2000/svg','svg');s5svg.setAttribute('width',1080);s5svg.setAttribute('height',1920);s5svg.classList.add('a');s5svg.style.transform='none';world.appendChild(s5svg);
+s5svg.innerHTML=`<defs><linearGradient id="ag" x1="0" x2="1"><stop offset="0" stop-color="#80e0e0"/><stop offset="1" stop-color="#aab3ef"/></linearGradient></defs>`;
+const arcs=NODES.map(([n,cc,x,y],i)=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');const mx=(HUB[0]+x)/2,my=(HUB[1]+y)/2;const dx=x-HUB[0],dy=y-HUB[1];const L=Math.hypot(dx,dy);const bend=(i%2?-1:1)*.28*L;
+ p.setAttribute('d',`M${HUB[0]},${HUB[1]} Q${mx-dy/L*bend},${my+dx/L*bend} ${x},${y}`);p.setAttribute('fill','none');p.setAttribute('stroke','url(#ag)');p.setAttribute('stroke-width','4');p.setAttribute('stroke-linecap','round');s5svg.appendChild(p);
+ const len=p.getTotalLength();p.style.strokeDasharray=len;return{p,len};});
+const nodeEls=NODES.map(([n,cc])=>{const d=$('div','a',world);d.style.cssText='width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 0 0 8px rgba(170,179,239,.25),0 0 30px rgba(128,224,224,.8)';
+ const l=$('div','a mono',world,`${n} <span style="color:#80e0e0">· ${cc}</span>`);l.style.cssText+='font-size:23px;letter-spacing:.18em;white-space:nowrap';return{d,l};});
+const pulses=NODES.map(()=>{const d=$('div','a',world);d.style.cssText='width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 18px 4px rgba(128,224,224,.9)';return d;});
+const hubRings=[0,1,2].map(()=>{const r=$('div','a',world);r.style.cssText='width:100px;height:100px;border-radius:50%;border:3px solid rgba(128,224,224,.8)';return r;});
+const hubLbl=$('div','a',world,`<div style="font-weight:700;font-size:30px;letter-spacing:.06em">PETALING JAYA</div><div class="mono" style="font-size:20px;color:#aab3ef;margin-top:4px">Malaysia · HQ</div>`);hubLbl.style.cssText+='text-align:right;white-space:nowrap';
+
+/* ================= SCENE 6 : LOGO + CTA ================= */
+const word=$('div','a',world);word.style.cssText='display:flex;font-weight:800;font-size:124px;letter-spacing:.04em;line-height:1;white-space:nowrap';
+const letters=[...'MARVANT'].map(ch=>{const m=$('div','',word);m.style.cssText='overflow:hidden;padding:0 0 .08em';const s=$('div','',m,ch);s.style.cssText='display:block';return s;});
+const evo=$('div','a',world,'EVOLUTIONS');evo.style.cssText+='font-weight:500;font-size:40px;color:#aab3ef;white-space:nowrap';
+const tag=mkLine('Performance marketing, <span class="grad-text" style="font-weight:700">evolved.</span>','',CX,1095);tag.el.style.cssText+='font-weight:500;font-size:46px;color:rgba(255,255,255,.92)';world.appendChild(tag.el);
+const cta=$('div','a',world);cta.style.cssText=`width:640px;height:116px;border-radius:58px;background:${GRAD};display:flex;align-items:center;justify-content:center;gap:18px;color:#231f20;font-weight:700;font-size:40px;overflow:hidden;box-shadow:0 20px 60px rgba(127,146,226,.45)`;
+cta.innerHTML=`<span style="position:relative;z-index:2">Start your evolution</span><svg style="position:relative;z-index:2" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#231f20" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><div id="ctash" style="position:absolute;top:0;left:0;width:160px;height:116px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent)"></div>`;
+const ctaSh=cta.querySelector('#ctash');
+const tap=$('div','a',world);tap.style.cssText='width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.55)';
+const url=$('div','a',world,'marvant.com');url.style.cssText+='font-weight:500;font-size:34px;letter-spacing:.12em;color:rgba(255,255,255,.75)';
+
+/* ================= IG SAFE-ZONE MOCK (storyboard only) ================= */
+const ig=$('div','',stage);ig.id='ig';ig.style.zIndex=60;
+ig.innerHTML=`<svg width="1080" height="1920" style="position:absolute;left:0;top:0">
+<defs><linearGradient id="igt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient><linearGradient id="igb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient></defs>
+<rect width="1080" height="230" fill="url(#igt)"/><rect y="1440" width="1080" height="480" fill="url(#igb)"/>
+<text x="48" y="140" fill="#fff" font-family="P" font-weight="700" font-size="54">Reels</text>
+<g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="964" y="96" width="70" height="56" rx="12"/><circle cx="999" cy="124" r="14"/>
+<path d="M1000 1300c-18-22-50-14-50 12 0 26 50 52 50 52s50-26 50-52c0-26-32-34-50-12z"/>
+<path d="M968 1470a34 34 0 1 1 14 26l-18 6 6-16"/>
+<path d="M962 1610l78-36-30 78-10-32z"/>
+</g><g fill="#fff"><circle cx="980" cy="1730" r="6"/><circle cx="1000" cy="1730" r="6"/><circle cx="1020" cy="1730" r="6"/></g>
+<text fill="#fff" font-family="P" font-weight="600" font-size="28" text-anchor="middle"><tspan x="1000" y="1408">2.4K</tspan><tspan x="1000" y="1548">128</tspan><tspan x="1000" y="1690">Share</tspan></text>
+<rect x="970" y="1790" width="60" height="60" rx="12" fill="#fff" opacity=".9"/>
+<circle cx="88" cy="1660" r="38" fill="url(#lg)"/><circle cx="88" cy="1660" r="38" fill="#7f92e2"/>
+<text x="144" y="1672" fill="#fff" font-family="P" font-weight="600" font-size="32">marvant.evolutions</text>
+<rect x="470" y="1630" width="130" height="56" rx="14" fill="none" stroke="#fff" stroke-width="3"/><text x="535" y="1668" fill="#fff" font-family="P" font-weight="600" font-size="28" text-anchor="middle">Follow</text>
+<text x="48" y="1748" fill="#fff" font-family="L" font-size="30">Your ads deserve to evolve. Here's how we… <tspan fill="#bbb">more</tspan></text>
+<text x="48" y="1810" fill="#ddd" font-family="L" font-size="28">♫  Original audio · marvant.evolutions</text>
+<rect x="0" y="1886" width="1080" height="4" fill="rgba(255,255,255,.35)"/>
+<rect x="120" y="250" width="840" height="1230" fill="none" stroke="#ff4d6d" stroke-width="3" stroke-dasharray="16 12"/>
+<text x="130" y="240" fill="#ff4d6d" font-family="P" font-weight="600" font-size="24">SAFE ZONE 840×1230</text></svg>`;
+
+/* ================= INIT / MEASURE ================= */
+let STOPW=0,BASE=0;
+function init(){
+ // fit headlines into 820px
+ document.querySelectorAll('.hl').forEach(e=>{const w=e.firstChild.scrollWidth;if(w>770){e.style.fontSize=(84*770/w).toFixed(1)+'px';}});
+ const c=document.createElement('canvas').getContext('2d');c.font='900 180px P';c.letterSpacing='-5.4px';STOPW=c.measureText('STOP').width;
+ const m=c.measureText('STOP');BASE=(m.fontBoundingBoxAscent-m.fontBoundingBoxDescent)/2;
+}
+
+/* ================= RENDER ================= */
+function render(t){
+ const f=Math.round(t*30);
+ grain.style.backgroundPosition=`${(f*73)%256}px ${(f*151)%256}px`;
+ // background orbs
+ const oI=K(t,[[0,.22],[1.3,.5],[7.5,.7],[7.75,1],[8.4,.6],[12.8,.65],[14,1]]);
+ const op=[[180+90*Math.sin(t*.7),560+120*Math.cos(t*.5)],[930+80*Math.cos(t*.6),1460+110*Math.sin(t*.45)],[540+140*Math.sin(t*.35+1),980+160*Math.cos(t*.4)]];
+ orbs.forEach((o,i)=>T(o,op[i][0],op[i][1],{o:oI*[.55,.42,.3][i]}));
+ T(grid,540,960+((t*28)%72),{o:K(t,[[0,0],[1.4,.6],[12.6,.6],[13.2,.25]])});
+ // world camera breathing
+ const zb=1+.018*Math.sin(t*.9)+K(t,[[12.6,0],[15,.02]]);world.style.transform=`scale(${zb})`;
+
+ /* ---------- S1 ---------- */
+ const D=1680,ST=1.2;
+ const pRaw=t<ST?D*E.o4(t/ST):D-26*Math.exp(-(t-ST)*7)*Math.sin((t-ST)*18);
+ const vel=t<ST?D*4*Math.pow(1-t/ST,3)/ST:0;
+ const ex=P(t,1.2,1.55,E.i3);
+ rows.forEach(({i,el})=>{let y=880+(i-8)*205+(D-pRaw);const d=i-8;
+  let o=clamp(1-Math.abs(y-880)/1100)*.55+.06;if(i===8)o=K(t,[[1.05,o],[1.22,0,E.o3]]);
+  if(d!==0)y+=Math.sign(d)*ex*(700+Math.abs(d)*160);o*=1-ex;
+  if(t>2.2)o=0;T(el,CX,y,{o,sk:-clamp(vel*.0022,0,9),b:i===8?P(t,1.05,1.22)*10:0});});
+ // STOP group
+ const stopIn=S(t,1.2,17,.42);const stopOut=P(t,1.95,2.3,E.i3);
+ const sgY=880+(D-pRaw)*0, sgS=lerp(1.35,1,stopIn)*lerp(1,.8,stopOut);
+ const totalW=STOPW+14+46;const txL=CX-totalW/2;
+ T(stopTxt,txL+STOPW/2-CX+CX,sgY,{s:sgS,o:(t>=1.2?clamp(stopIn*1.4):0)*(1-stopOut),b:stopOut*14+(1-clamp(stopIn*1.3))*8});
+ 
+ lineIn(s1sub,t,1.5,1.95);place(s1sub);
+ // hero dot position in S1 (period of STOP.)
+ const stC=txL+STOPW/2;const dotX=stC+(STOPW/2+14+23)*sgS, dotY=sgY+(BASE-23)*sgS;
+ T(ripple,dotX,dotY,{s:P(t,1.3,1.85,E.o3)*2.8,o:t<1.3?0:1-P(t,1.3,1.85)});
+
+ /* ---------- HERO track ---------- */
+ let hx,hy,hw,hh,hr,hs=1,hrot=0,ho=1,gO=1,baseCol=C.mist,cardO=0,mO=0,mDraw=0,shadow='none',shX=-200;
+ if(t<2.0){hx=dotX;hy=dotY;hw=hh=46;hr=23;hs=S(t,1.34,20,.38)*sgS;ho=t<1.34?0:1;}
+ else if(t<2.95){const m=P(t,2.0,2.55,E.io3),g=P(t,2.08,2.7,E.expo);hx=lerp(dotX,CX,m);hy=lerp(dotY,930,m);hw=lerp(46,520,g);hh=lerp(46,660,g);hr=lerp(23,36,g);gO=1-P(t,2.25,2.6);hs=1;}
+ else if(t<4.5){hw=520;hh=660;hr=36;gO=0;
+  const sp=S(t,2.95,12,.68),back=S(t,4.0,11,.72);hx=lerp(lerp(CX,745,sp),CX,back);hy=930;hs=lerp(lerp(1,.64,sp),.82,back);hrot=lerp(3*sp,0,back);}
+ else if(t<7.3){const m=P(t,4.5,4.95,E.expo);hw=lerp(520,200,m);hh=lerp(660,200,m);hr=lerp(36,100,m);hs=lerp(.82,1,m);hx=CX;hy=lerp(930,920,m);gO=P(t,4.5,4.8);
+  hs*=1+.035*Math.sin((t-5)*3.2)*P(t,5,5.4);}
+ else if(t<7.95){const z=P(t,7.3,7.78,E.i3);hw=hh=lerp(200,2600,z);hr=hw/2;hx=CX;hy=920;gO=1;ho=1-P(t,7.72,7.95);}
+ else if(t<10.4){gO=0;baseCol=C.t;hw=hh=24;hr=12;const pr=P(t,8.15,9.25,E.o3);const pt=cl.getPointAtLength(clLen*pr);
+  const card=bigCardPos(t);hx=card.x-410+pt.x;hy=card.y-215+pt.y;ho=t<8.15?0:1;hs=S(t,8.15,18,.5);shadow='0 0 0 8px rgba(128,224,224,.25),0 0 40px rgba(128,224,224,.9)';}
+ else if(t<12.75){gO=0;baseCol=C.t;const card=bigCardPos(10.4);const sx=card.x-410+780,sy=card.y-215+262;const m=P(t,10.4,10.95,E.io3);
+  hx=lerp(sx,HUB[0],m);hy=lerp(sy,HUB[1],m)-Math.sin(m*Math.PI)*160;hw=hh=lerp(24,40,m);hr=hw/2;shadow='0 0 0 10px rgba(128,224,224,.22),0 0 50px rgba(128,224,224,.9)';hs=1+.08*Math.sin(t*9)*P(t,11,11.3);
+  baseCol=mix(C.t,'#ffffff',P(t,10.9,11.2));}
+ else{const m=P(t,12.75,13.25,E.expo),mp=P(t,12.7,13.15,E.io3);hx=lerp(HUB[0],CX,mp);hy=lerp(HUB[1],620,mp);hw=hh=lerp(40,230,m);hr=lerp(20,64,m);gO=P(t,12.75,13.0);baseCol='#ffffff';
+  shadow=`0 30px 90px rgba(127,146,226,${.55*m})`;hs=lerp(1.12,1,S(t,13.2,14,.5))*(t<13.2?1:1);}
+ if(t>=2.0&&t<4.6)cardO=1;
+ const cardRev=t<4.5?1:1-P(t,4.5,4.66);
+ cB.parts.forEach((p,i)=>{const k=P(t,2.5+i*.06,2.95+i*.06,E.expo);p.style.opacity=k*cardRev;p.style.transform=`translateY(${(1-k)*34}px)`;});
+ cB.root.style.display=cardO?'block':'none';
+ cB.root.style.transform=`scale(${hw/520>0?1:1})`;
+ if(t>=4.6&&t<7.95){mO=1;mDraw=P(t,4.85,5.35,E.io3);}
+ if(t>=12.9){mO=1;mDraw=P(t,13.05,13.6,E.io3);}
+ heroM.style.opacity=mO*(t>7.3&&t<7.95?1-P(t,7.4,7.7):1);mPath.style.strokeDashoffset=mLen*(1-mDraw);
+ const mScale=hw/200*(t>=12.9?.62:.62);heroM.style.transform=`translate(-50%,-50%) scale(${mScale})`;
+ if(t>13.75)shX=lerp(-200,hw+200,P(t,13.75,14.25,E.io3));shine.style.transform=`translate(${shX}px,-200px) rotate(20deg)`;
+ heroGrad.style.opacity=gO;
+ hero.style.width=hw+'px';hero.style.height=hh+'px';hero.style.borderRadius=hr+'px';hero.style.background=baseCol;
+ const ring=t>3.7&&t<4.6?P(t,3.72,3.95,E.o3)*(1-P(t,4.45,4.6)):0;
+ hero.style.boxShadow=ring>0?`0 0 0 ${7*ring}px #80e0e0, 0 30px 80px rgba(0,0,0,.4)`:(t>2.6&&t<4.7?'0 30px 80px rgba(0,0,0,.45)':shadow);
+ T(hero,hx,hy,{s:hs,r:hrot,o:ho});
+
+ /* ---------- S2 ---------- */
+ lineIn(s2h[0],t,2.32,3.22,{out:.3});lineIn(s2h[1],t,2.4,3.26,{out:.3});lineIn(s2h[2],t,3.42,4.38,{out:.3});lineIn(s2h[3],t,3.5,4.42,{out:.3});s2h.forEach(l=>place(l));
+ // card A
+ const spA=S(t,2.95,12,.68),awayA=P(t,4.0,4.45,E.i3),dimA=P(t,3.7,3.95,E.o3);
+ cA.parts.forEach(p=>p.style.opacity=1);
+ cardA.style.filter=dimA>0?`grayscale(${dimA}) brightness(${1-.35*dimA})`:'none';
+ T(cardA,lerp(CX,335,spA)-awayA*700,930,{s:lerp(1,.64,spA)*lerp(1,.94,dimA),r:-3*spA-awayA*14,o:(t>2.94&&t<4.5?1:0)*(1-awayA)*lerp(1,.55,dimA),b:awayA*12});
+ cardA.style.zIndex=0;hero.style.zIndex=2;
+ // labels
+ abLbl.forEach((e,i)=>{const k=S(t,3.08+i*.05,18,.5);const out=P(t,3.95,4.15);T(e,i?745:335,668,{s:k*(1-out),o:clamp(k)*(1-out)});});
+ mChips.forEach((e,i)=>{const col=i<2?335:745,row=i%2;const k=S(t,3.42+i*.06,18,.55);const out=P(t,3.98+(i<2?0:.05),4.2);
+  T(e,col+(row?82:-82),1192,{s:k,o:clamp(k)*(1-out)*(i<2?1-awayA:1),b:out*6});});
+ { const k=S(t,3.78,20,.42),out=P(t,4.4,4.55);T(check,745+333/2-10,930-422/2+10,{s:k*(1-out)*(1-S(t,4.0,14,.8)*.0),o:clamp(k*3)*(1-out)});
+   const back=S(t,4.0,11,.72);check.style.left=(-back*(745-540)*1)+'px';check.style.top=(-back*0)+'px';
+   if(t>=4.0){const cx=lerp(745+156,540+.82*260-14,back),cy=lerp(930-201,930-.82*330+14,back);T(check,cx,cy,{s:k*(1-out),o:clamp(k*3)*(1-out)});check.style.left='0px';}}
+ ghosts.forEach((g,i)=>{const k=S(t,4.08+i*.04,13,.6),col=P(t,4.45,4.7,E.i3);const off=[-1,-.5,.5,1][i];
+  T(g,CX+off*125*k*(1-col),930+12*k,{s:.8*lerp(1,.4,col),r:off*13*k*(1-col),o:(t>4.08&&t<4.75?.32+.12*(Math.abs(off)<1):0)*(1-col)});g.style.zIndex=1;});
+ // stepper
+ { const vin=S(t,2.88,16,.6),vout=P(t,4.45,4.7,E.i3);T(stepper,CX,1360,{o:clamp(vin)*(1-vout),s:lerp(.9,1,clamp(vin)),b:vout*8});
+  const xs=[110,300,490];const ws=[150,180,180];const lead=K(t,[[2.95,0],[3.45,1,E.o4],[3.6,1],[4.0,2,E.o4]]);const trail=K(t,[[2.95,0],[3.55,1,E.o3],[3.65,1],[4.12,2,E.o3]]);
+  const xa=lerp(xs[Math.floor(trail)]??xs[2],xs[Math.min(2,Math.floor(trail)+1)],trail%1),xb=lerp(xs[Math.floor(lead)]??xs[2],xs[Math.min(2,Math.floor(lead)+1)],lead%1);
+  const w1=lerp(ws[Math.floor(Math.min(trail,2))],ws[Math.min(2,Math.floor(trail)+1)],trail%1);
+  const L0=Math.min(xa,xb)-w1/2,R0=Math.max(xa,xb)+w1/2;stepPill.style.width=(R0-L0)+'px';T(stepPill,(L0+R0)/2,36,{});
+  stepWords.forEach((e,i)=>{const act=1-clamp(Math.abs(lead-i));T(e,xs[i],36,{});e.style.color=mix('#ffffff',C.ink,act);e.style.opacity=.55+.45*act;});
+  stepSeps.forEach((e,i)=>T(e,(xs[i]+xs[i+1])/2+(i?6:0),36,{o:.9}));}
+
+ /* ---------- S3 ---------- */
+ lineIn(s3eb,t,4.76,7.1,{out:.3});lineIn(s3h[0],t,4.82,7.12,{out:.3});lineIn(s3h[1],t,4.9,7.16,{out:.3});[s3eb,...s3h].forEach(l=>place(l));
+ const s3in=P(t,4.85,5.4,E.o3),s3out=P(t,7.12,7.42,E.i3);
+ s3svg.style.opacity=t>4.8&&t<7.6?1:0;
+ s3svg.querySelector('#rings').style.opacity=s3in*(1-s3out);
+ ['rT','rB'].forEach((id,j)=>{const e=s3svg.querySelector('#'+id);const rx=300*E.expo(clamp((t-4.9-j*.08)/.6))*(1-s3out);e.setAttribute('rx',Math.max(0,rx));e.setAttribute('ry',Math.max(0,74*rx/300));e.setAttribute('transform',`rotate(${j?6:-6} 540 ${j?1115:735})`);});
+ const d1=s3svg.querySelector('#dash1'),d2=s3svg.querySelector('#dash2');d1.setAttribute('transform',`rotate(${t*40} 540 920)`);d1.style.opacity=P(t,4.95,5.3)*(1-s3out);d1.setAttribute('r',150*(.6+.4*P(t,4.95,5.4,E.expo)));
+ d2.style.opacity=P(t,5.05,5.4)*(1-s3out);d2.setAttribute('r',186*(.6+.4*P(t,5.05,5.5,E.expo)));
+ const pd=[];
+ pills.forEach((e,i)=>{const ring=i<4?0:1,k=i%4;const cy=ring?1115:735,rot=(ring?6:-6)*Math.PI/180;const dir=ring?-1:1;
+  const th=k*Math.PI/2+(ring?Math.PI/4:0)+dir*(t-5)*.62;let rx=300*Math.cos(th),ry=74*Math.sin(th);
+  const ex=S(t,5.0+i*.07,11,.62)*(1-s3out);
+  let x=CX+(rx*Math.cos(rot)-ry*Math.sin(rot))*ex,y=920+(cy-920+rx*Math.sin(rot)+ry*Math.cos(rot))*ex;
+  const depth=(Math.sin(th)+1)/2;const sc=(.78+.26*depth)*clamp(ex*1.15);
+  T(e,x,y,{s:sc,o:(t>5&&t<7.5?clamp(ex*2):0)*(.55+.45*depth),b:(1-depth)*1.6+s3out*6});e.style.zIndex=depth>.5?3:1;
+  pd.push([x,y]);const l=spokes[i];l.setAttribute('x1',540);l.setAttribute('y1',920);l.setAttribute('x2',x);l.setAttribute('y2',y);l.style.opacity=(t>5.05&&t<7.4?.5:0)*(.3+.7*depth);});
+
+ /* ---------- S4 ---------- */
+ lineIn(s4eb,t,7.72,10.3);lineIn(s4h[0],t,7.78,10.32);lineIn(s4h[1],t,7.86,10.36);[s4eb,...s4h].forEach(l=>place(l));
+ const bc=bigCardPos(t);T(bigC,bc.x,bc.y,{rx:bc.rx,o:bc.o,b:bc.b});
+ const sA=smallPos(t,7.98,10.42),sB=smallPos(t,8.06,10.48);T(smA,335,1205+sA.dy,{rx:sA.rx,o:sA.o,b:sA.b});T(smB,745,1205+sB.dy,{rx:sB.rx,o:sB.o,b:sB.b});
+ const c40=Math.round(40*P(t,8.15,9.25,E.o4));M_set(n40,`+${c40}%`);ccr.setAttribute('width',780*P(t,8.15,9.25,E.o3));cl.style.strokeDashoffset=clLen*(1-P(t,8.15,9.25,E.o3));
+ const c30=Math.round(30*P(t,8.3,9.3,E.o4));M_set(n30,`−${c30}%`);b30.style.width=(100-c30)+'%';
+ const c50=Math.round(50*P(t,8.4,9.4,E.o4));M_set(n50,c50+(c50>=50?'+':''));
+ dotsEl.forEach((d,i)=>{const on=i<c50;d.style.background=on?(i%3===0?'#80e0e0':i%3===1?'#7f92e2':'#aab3ef'):'rgba(255,255,255,.12)';});
+
+ /* ---------- S5 ---------- */
+ lineIn(s5eb,t,10.55,12.35);lineIn(s5h[0],t,10.6,12.38);lineIn(s5h[1],t,10.68,12.42);[s5eb,...s5h].forEach(l=>place(l));
+ const gIn=P(t,10.7,11.5,E.o3),s5out=P(t,12.4,12.85,E.io3);
+ T(dgrid,540,1060,{o:(t>10.6?1:0)*(1-P(t,12.4,12.8))});dgrid.style.webkitMaskImage=`radial-gradient(circle at ${HUB[0]}px 500px, rgba(0,0,0,.55) 0, rgba(0,0,0,.18) ${gIn*420}px, transparent ${gIn*620+1}px)`;
+ s5svg.style.opacity=t>10.8&&t<12.95?1:0;
+ arcs.forEach(({p,len},i)=>{const dr=P(t,11.0+i*.11,11.55+i*.11,E.io3)*(1-s5out);p.style.strokeDashoffset=len*(1-dr);
+  const n=NODES[i];const nd=nodeEls[i];const ap=dr>0?p.getPointAtLength(len*dr):{x:HUB[0],y:HUB[1]};
+  const k=S(t,11.45+i*.11,18,.45);T(nd.d,s5out>0?ap.x:n[2],s5out>0?ap.y:n[3],{s:s5out>0?1-s5out*.5:k,o:t<11.45+i*.11?0:clamp(k)*(1-P(t,12.75,12.9))});
+  const lx=n[2],ly=n[3]+44;T(nd.l,lx,ly,{o:P(t,11.55+i*.11,11.85+i*.11)*(1-P(t,12.35,12.55)),b:(1-P(t,11.55+i*.11,11.85+i*.11))*6});
+  const pp=((t-11.6-i*.17)*.75)%1;const pq=p.getPointAtLength(len*Math.max(0,pp));T(pulses[i],pq.x,pq.y,{o:t>11.7+i*.11&&t<12.4?Math.sin(Math.max(0,pp)*Math.PI):0});});
+ hubRings.forEach((r,i)=>{const ph=((t-11.0)/1.2+i/3)%1;T(r,HUB[0],HUB[1],{s:.4+ph*2.2,o:t>11.0&&t<12.5?(1-ph)*.7:0});});
+ T(hubLbl,HUB[0]-44-hubLbl.offsetWidth/2,HUB[1]+2,{o:P(t,11.15,11.45)*(1-P(t,12.35,12.55)),b:(1-P(t,11.15,11.45))*6});
+
+ /* ---------- S6 ---------- */
+ const wx=CX,wy=850;T(word,wx,wy,{o:t>13.1?1:0});
+ letters.forEach((s,i)=>{const k=P(t,13.15+i*.045,13.75+i*.045,E.expo);s.style.transform=`translateY(${(1-k)*110}%)`;});
+ const ek=P(t,13.45,14.15,E.expo);evo.style.letterSpacing=lerp(1.4,.5,ek)+'em';T(evo,CX+lerp(1.4,.5,ek)*20,948,{o:ek,b:(1-ek)*6});
+ lineIn(tag,t,13.6,null);place(tag);
+ const ck=S(t,13.85,13,.5),press=t>14.5?1-.05*Math.sin(clamp((t-14.5)/.28)*Math.PI):1;T(cta,CX,1262,{s:lerp(.6,1,ck)*press,o:clamp(ck*1.6)});
+ ctaSh.style.transform=`translateX(${lerp(-200,700,P(t,14.15,14.6,E.io3))}px) skewX(-18deg)`;
+ const tk=P(t,14.5,14.95,E.o3);T(tap,CX+170,1262,{s:.3+tk*2.2,o:t>14.5?(1-tk)*.8:0});
+ const uk=P(t,14.05,14.45,E.expo);T(url,CX,1380,{o:uk,b:(1-uk)*6});url.style.marginTop=0;
+}
+function M_set(e,s){if(e.textContent!==s)e.textContent=s;}
+function bigCardPos(t){const k=S(t,7.82,10,.72);const out=P(t,10.35,10.7,E.i3);return{x:CX,y:808+(1-k)*160+out*240,rx:(1-clamp(k))*35-out*20,o:(t<7.82?0:clamp(k*1.6))*(1-out),b:out*12};}
+function smallPos(t,t0,t1){const k=S(t,t0,10,.72);const out=P(t,t1,t1+.35,E.i3);return{dy:(1-k)*180+out*260,rx:(1-clamp(k))*40,o:(t<t0?0:clamp(k*1.6))*(1-out),b:out*12};}
+
+window.DURATION=15;
+window.seek=t=>render(t);
+window.ready=document.fonts.load('900 180px P').then(()=>Promise.all(['800 84px P','500 40px P','600 30px P','700 28px L','400 20px L'].map(f=>document.fonts.load(f)))).then(()=>document.fonts.ready).then(()=>{init();render(+(new URLSearchParams(location.search).get('t')||0));if(location.search.includes('ig'))document.body.classList.add('show-ig');});
+</script></body></html>
