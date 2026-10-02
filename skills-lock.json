@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "motion-broll": {
+      "source": "Barty-Bart/motion-graphics",
+      "sourceType": "github",
+      "skillPath": "skills/motion-broll/SKILL.md",
+      "computedHash": "dcda5cd6e20774834da716deba4fef5613e295a07536c158286f62c46912a170"
+    }
+  }
+}
