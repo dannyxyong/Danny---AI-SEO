@@ -2,17 +2,17 @@ from PIL import Image, ImageDraw, ImageFont
 F='../fonts/'
 def f(w,s): return ImageFont.truetype(F+f'Poppins-{w}.ttf',s)
 def l(w,s): return ImageFont.truetype(F+f'Lato-{w}.ttf',s)
-SEC=[("01","HOOK","0.0 – 2.2s",["0.35","1.90"],"Outline 'SCROLL' rows race up the feed with speed-skew, then spring-snap. One row lands as STOP. — its period is the hero dot (the one shape that never cuts)."),
-("02","EVOLVE","2.2 – 4.6s",["3.85","4.25"],"The dot morphs into a live ad card, splits into A/B, the loser greys out, the winner gets the teal ring + check and fans into copies. Liquid stepper: TEST › LEARN › SCALE."),
-("03","PLATFORMS","4.6 – 7.6s",["5.30","6.40"],"Winner card collapses into the gradient M core. 8 channels (Meta, Google, TikTok, LinkedIn, XHS, SEO, Web+CRO, Content) spring out onto counter-rotating 3D orbits. Core zooms through camera as a full-screen flash."),
-("04","PROOF","7.6 – 10.6s",["8.60","9.80"],"Glass dashboard cards rise with 3D tilt. Counters roll to +40% bookings, −30% low-quality leads (Everkitchen) and 50+ home & living brands. Chart draws on; its tip is the hero dot."),
-("05","REACH","10.6 – 12.8s",["11.30","12.10"],"The chart dot arcs across to Petaling Jaya HQ. Dot-grid map reveals radially; routes draw to Seoul, Bangkok, Singapore, Sydney with travelling light pulses."),
-("06","BRAND + CTA","12.8 – 15.0s",["13.40","14.90"],"Network folds back into the hub, which grows into the M app-tile. MARVANT letters rise, EVOLUTIONS tracks in, CTA pill springs up, shimmers and gets a tap.")]
+SEC=[("01","HOOK","0.0 – 2.0s",["0.90","1.70"],"'Your customers now ask AI.' A prompt bar springs out of a dot and types 'Best interior designer in KL?' while ghost queries drift behind. Send button pressed."),
+("02","THE PROBLEM","2.0 – 4.5s",["3.00","4.10"],"The bar unfolds into an AI answer card. Three competitors stream in with citations; 'Your Brand' slides in dashed, gets a red 'Not mentioned' and a shake. 'Is your brand in the answer?'"),
+("03","MARVANT AI SEO","4.5 – 7.6s",["5.40","6.50"],"The card collapses into the gradient M core. ChatGPT, Gemini, Perplexity and AI Overviews orbit on top; Entity SEO, Schema, Answer content and Citations below. Core zooms through camera as a flash."),
+("04","HOW IT WORKS","7.6 – 10.2s",["8.60","9.90"],"Three glass step cards rise in 3D: map your entities, answer-ready content, earn the citations. The hero dot travels the timeline ticking each step; engine chips light up."),
+("05","THE PAYOFF","10.2 – 12.5s",["11.20","12.00"],"Callback: the dot grows back into the same AI answer — now 'Your Brand' is #1, teal-outlined, 'Top pick' with a source line and a light burst. 'Now AI recommends you.'"),
+("06","BRAND + CTA","12.5 – 15.0s",["13.30","14.90"],"The answer card folds into the M app-tile. MARVANT rises letter by letter, EVOLUTIONS tracks in, 'AI SEO that gets you cited.' CTA pill springs, shimmers and gets tapped.")]
 TW,TH=360,640; PAD=40; COLW=TW*2+16
 cols=3; rows=2; CW=COLW+PAD; CH=TH+250
 Wb=cols*CW+PAD; Hb=rows*CH+PAD+190
 im=Image.new('RGB',(Wb,Hb),'#0e0c10'); d=ImageDraw.Draw(im)
-d.text((PAD,46),"MARVANT EVOLUTIONS — 15s REEL · STORYBOARD",font=f(800,46),fill='white')
+d.text((PAD,46),"MARVANT AI SEO — 15s REEL · STORYBOARD v2",font=f(800,46),fill='white')
 d.text((PAD,110),"1080×1920 · 30fps · 6 sections · one continuous hero shape · all copy inside the 840×1230 IG safe zone",font=l(400,26),fill='#aab3ef')
 for i,(n,name,tc,ts,desc) in enumerate(SEC):
     x=PAD+(i%cols)*CW; y=190+(i//cols)*CH
@@ -34,7 +34,7 @@ for i,(n,name,tc,ts,desc) in enumerate(SEC):
     for k,ln in enumerate(lines[:5]): d.text((x,y+TH+76+k*30),ln,font=fnt,fill='#d6d6e0')
 im.save('storyboard.png',optimize=True)
 # safe zone sheet
-ts=["0.35","1.90","3.85","6.40","9.80","12.10","14.90"]; w,h=300,533
+ts=["1.70","4.10","6.50","9.90","12.00","14.90"]; w,h=300,533
 s=Image.new('RGB',(PAD+len(ts)*(w+16),h+150),'#0e0c10'); ds=ImageDraw.Draw(s)
 ds.text((PAD,30),"INSTAGRAM SAFE-ZONE CHECK — mock Reels UI overlaid (red dashed = content limit)",font=f(700,30),fill='white')
 for i,t in enumerate(ts):
