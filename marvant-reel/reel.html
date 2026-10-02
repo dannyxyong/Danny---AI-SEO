@@ -66,7 +66,7 @@ function T(e,x,y,o={}){const s=o.s??1,r=o.r??0,op=o.o??1,b=o.b??0;
  e.style.opacity=clamp(op);e.style.filter=b>.05?`blur(${b}px)`:'none';e.style.visibility=op<=0.001?'hidden':'visible';}
 function lineIn(L,t,tin,tout,{dur=.6,out=.32}={}){const k=P(t,tin,tin+dur,E.expo);const q=tout==null?0:P(t,tout,tout+out,E.i3);
  L.in.style.transform=`translateY(${(1-k)*112-q*112}%)`;L.in.style.filter=(q>0.02||k<.98)?`blur(${(1-k)*6+q*8}px)`:'none';
- L.el.style.visibility=(k<=0||q>=1)?'hidden':'visible';T(L.el,L.x,L.y);}
+ T(L.el,L.x,L.y);L.el.style.visibility=(k<=0||q>=1)?'hidden':'visible';}
 function mkLine(html,cls,x,y,parent){const el=$('div','a ln '+(cls||''),parent);const inn=$('div','in',el,html);return{el,in:inn,x,y};}
 const ICON={
  spark:(s,c)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${c}"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>`,
