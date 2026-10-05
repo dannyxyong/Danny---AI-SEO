@@ -144,16 +144,30 @@ A2.innerHTML=`<div class="who"><div class="spk">${ICON.spark(28,'#fff')}</div>AI
  `<div class="r" id="win" style="top:176px;height:140px;border:3px solid #80e0e0;box-shadow:0 14px 40px rgba(127,146,226,.35)"><div class="bd" style="width:68px;height:68px;font-size:30px;background:${GRAD};color:#231f20">1</div><div><div class="nm" style="font-size:34px">Your Brand</div><div style="font-family:L;font-size:21px;color:#7f92e2;margin-top:6px">Source: yourbrand.com.my</div></div><div class="src" style="background:#80e0e0;color:#231f20">★ Top pick</div></div>`+
  row(340,88,'2','Studio A',220,'<div class="src">[2]</div>','opacity:.55')+row(442,88,'3','Design Co. B',180,'<div class="src">[3]</div>','opacity:.45');
 const A2p=[...A2.children];const win=A2.querySelector('#win');
-// M glyph + shine
-const heroM=$('div','a',hero,`<svg viewBox="-100 -100 200 200" width="200" height="200"><path class="mpath" d="M-52 48 V-46 L0 14 L52 -46 V48" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>`);heroM.style.cssText+='left:50%;top:50%;width:200px;height:200px';
-const mPath=heroM.querySelector('.mpath');const mLen=mPath.getTotalLength();mPath.style.strokeDasharray=mLen;
+// Marvant mark, traced from the supplied logo (logo-pixel coords; mark bbox 6..226 x 4..145)
+const MK_L=[[84,4],[111,42],[54,145],[6,145]];
+const MK_R=[[151,7],[151,7],[226,145],[177,145],[151.5,98],[124,145],[78,145]];
+const pts=a=>a.map(p=>p.join(',')).join(' ');
+const LS=2.4,LX=x=>540+(x-116)*LS,LY=y=>450+(y-4)*LS;     // end-card lockup placement
+const heroM=$('div','a',hero,`<svg viewBox="6 4 220 141" width="200" height="128"><g id="hmL"><polygon fill="#fff" points="${pts(MK_L)}"/></g><g id="hmR"><polygon fill="#fff" points="${pts(MK_R)}"/></g></svg>`);heroM.style.cssText+='left:50%;top:50%;width:200px;height:128px';
+const hmL=heroM.querySelector('#hmL'),hmR=heroM.querySelector('#hmR');
 const shine=$('div','a',hero);shine.style.cssText='width:120px;height:600px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)';
 
 /* ================= S6 : LOGO + CTA ================= */
-const word=$('div','a',world);word.style.cssText='display:flex;font-weight:800;font-size:124px;letter-spacing:.04em;line-height:1;white-space:nowrap';
-const letters=[...'MARVANT'].map(ch=>{const m=$('div','',word);m.style.cssText='overflow:hidden;padding:0 0 .08em';const s=$('div','',m,ch);s.style.cssText='display:block';return s;});
-const evo=$('div','a',world,'EVOLUTIONS');evo.style.cssText+='font-weight:500;font-size:40px;color:#aab3ef;white-space:nowrap';
-const tag=mkLine('AI SEO that gets you <span class="grad-text" style="font-weight:700">cited.</span>','',CX,1095,world);tag.el.style.cssText+='font-weight:500;font-size:48px;color:rgba(255,255,255,.92)';
+const logoSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');logoSvg.setAttribute('width',1080);logoSvg.setAttribute('height',1920);logoSvg.classList.add('a');world.appendChild(logoSvg);
+logoSvg.innerHTML=`<defs><linearGradient id="lgG" gradientUnits="userSpaceOnUse" x1="270" y1="440" x2="810" y2="800"><stop offset="0" stop-color="#aab3ef"/><stop offset=".5" stop-color="#7f92e2"/><stop offset="1" stop-color="#80e0e0"/></linearGradient>
+<linearGradient id="lgS" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="220" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<g id="lgGlow" style="filter:drop-shadow(0 20px 60px rgba(127,146,226,.55))"><polygon id="lg1" fill="url(#lgG)"/><polygon id="lg2" fill="url(#lgG)"/><polygon id="lw1" fill="#fff"/><polygon id="lw2" fill="#fff"/></g>
+<polygon id="ls1" fill="url(#lgS)"/><polygon id="ls2" fill="url(#lgS)"/>`;
+const LG=['lg1','lg2','lw1','lw2','ls1','ls2'].map(id=>logoSvg.querySelector('#'+id));const lgS=logoSvg.querySelector('#lgS');
+const SQ=140,SQX=LX(116),SQY=LY(74.5);   // the tile the hero becomes, then splits into the two mark pieces
+const ST_L=[[SQX-70,SQY-70],[SQX,SQY-70],[SQX,SQY+70],[SQX-70,SQY+70]];
+const ST_R=[[SQX,SQY-70],[SQX+70,SQY-70],[SQX+70,SQY+70],[SQX+46,SQY+70],[SQX+35,SQY+70],[SQX+23,SQY+70],[SQX,SQY+70]];
+const word=$('div','a',world);word.style.cssText='display:flex;font-weight:700;font-size:96px;line-height:1;white-space:nowrap';
+const letters=[...'MARVANT'].map(ch=>{const m=$('div','',word);m.style.cssText='overflow:hidden;padding:0 0 .1em';const s=$('div','',m,ch);s.style.cssText='display:block';return s;});
+const evo=$('div','a',world,'DIGITAL MARKETING');evo.style.cssText+='font-weight:400;font-size:34px;line-height:1;color:#fff;white-space:nowrap';
+let EVO_W0=0;
+const tag=mkLine('AI SEO that gets you <span class="grad-text" style="font-weight:700">cited.</span>','',CX,1062,world);tag.el.style.cssText+='font-weight:500;font-size:48px;color:rgba(255,255,255,.92)';
 const cta=$('div','a',world);cta.style.cssText=`width:700px;height:116px;border-radius:58px;background:${GRAD};display:flex;align-items:center;justify-content:center;gap:16px;color:#231f20;font-weight:700;font-size:37px;overflow:hidden;box-shadow:0 20px 60px rgba(127,146,226,.45)`;
 cta.innerHTML=`<span style="position:relative;z-index:2;white-space:nowrap">Get a free AI SEO audit</span><span style="position:relative;z-index:2;display:flex">${ICON.arrow(38,'#231f20')}</span><div id="ctash" style="position:absolute;top:0;left:0;width:160px;height:116px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent)"></div>`;
 const ctaSh=cta.querySelector('#ctash');
@@ -179,7 +193,10 @@ ig.innerHTML=`<svg width="1080" height="1920" style="position:absolute;left:0;to
 <rect x="120" y="250" width="840" height="1230" fill="none" stroke="#ff4d6d" stroke-width="3" stroke-dasharray="16 12"/>
 <text x="130" y="240" fill="#ff4d6d" font-family="P" font-weight="600" font-size="24">SAFE ZONE 840×1230</text></svg>`;
 
-function init(){document.querySelectorAll('.hl').forEach(e=>{const w=e.firstChild.scrollWidth;if(w>770)e.style.fontSize=(84*770/w).toFixed(1)+'px';});}
+function init(){
+ {const c=document.createElement('canvas').getContext('2d');c.font='700 96px P';const w0=c.measureText('MARVANT').width;const ls=(225*LS-w0)/6;
+  word.querySelectorAll(':scope>div').forEach((d,i)=>{if(i<6)d.style.marginRight=ls+'px';});
+  c.font='400 34px P';EVO_W0=c.measureText('DIGITAL MARKETING').width;}document.querySelectorAll('.hl').forEach(e=>{const w=e.firstChild.scrollWidth;if(w>770)e.style.fontSize=(84*770/w).toFixed(1)+'px';});}
 const set=(e,s)=>{if(e.textContent!==s)e.textContent=s;};
 const stagger=(parts,t,t0,dt,dur=.45,mul=1)=>parts.forEach((p,i)=>{const k=P(t,t0+i*dt,t0+i*dt+dur,E.expo);p.style.opacity=k*mul;p.style.transform=`translateY(${(1-k)*30}px)`;});
 
@@ -214,8 +231,8 @@ function render(t){
   hs=S(t,8.1,18,.5);ho=t<8.1?0:1;shadow='0 0 0 8px rgba(128,224,224,.25),0 0 40px rgba(128,224,224,.9)';}
  else if(t<12.45){const m=P(t,10.1,10.5,E.io3),g=P(t,10.25,10.8,E.expo);hx=lerp(190,CX,m);hy=lerp(STEPY[2],1000,m);hw=lerp(26,820,g);hh=lerp(26,580,g);hr=lerp(13,36,g);
   col=mix(C.t,C.mist,P(t,10.25,10.55));shadow=`0 30px 90px rgba(0,0,0,.5),0 0 0 ${3*P(t,11,11.3)}px rgba(128,224,224,.6)`;}
- else{const m=P(t,12.45,13.0,E.expo),mp=P(t,12.45,12.95,E.io3);hx=CX;hy=lerp(1000,620,mp);hw=lerp(820,230,m);hh=lerp(580,230,m);hr=lerp(36,64,m);gO=P(t,12.5,12.8);col=C.mist;
-  mO=P(t,12.85,12.95);mDraw=P(t,12.95,13.5,E.io3);shadow=`0 30px 90px rgba(127,146,226,${.55*m})`;}
+ else{const m=P(t,12.45,12.9,E.expo),mp=P(t,12.45,12.88,E.io3);hx=lerp(CX,SQX,mp);hy=lerp(1000,SQY,mp);hw=lerp(820,SQ,m);hh=lerp(580,SQ,m);hr=lerp(36,4,m);gO=P(t,12.5,12.75);col=C.mist;
+  ho=t<12.92?1:0;shadow=`0 30px 90px rgba(127,146,226,${.55*m})`;}
  hero.style.width=hw+'px';hero.style.height=hh+'px';hero.style.borderRadius=hr+'px';hero.style.background=col;hero.style.boxShadow=shadow;heroGrad.style.opacity=gO;
  T(hero,hx,hy,{s:hs,o:ho});
  prompt.style.opacity=pO;prompt.style.display=pO>0?'block':'none';
@@ -234,7 +251,9 @@ function render(t){
  A2p.slice(4).forEach((p,i)=>{const k=P(t,11.0+i*.1,11.45+i*.1,E.expo);p.style.opacity=k*a2out*(i?.45:.55);p.style.transform=`translateY(${(1-k)*30}px)`;});
  // rays burst from the winner badge
  const rk=P(t,11.05,11.6,E.o3);rays.forEach((r,i)=>{const a=i/rays.length*Math.PI*2;const R=60+rk*90;T(r,CX-410+34+24+34+Math.cos(a)*R,1000-290+176+70+Math.sin(a)*R,{r:a*180/Math.PI+90,o:t>11.05&&t<11.6?(1-rk):0,s:1-rk*.4});});
- heroM.style.opacity=mO;mPath.style.strokeDashoffset=mLen*(1-mDraw);heroM.style.transform=`translate(-50%,-50%) scale(${hw/200*.62})`;
+ heroM.style.opacity=mO;heroM.style.transform=`translate(-50%,-50%) scale(${hw/200*.6})`;
+ {const kL=E.expo(clamp(mDraw*1.6)),kR=E.expo(clamp(mDraw*1.6-.45));hmL.setAttribute('transform',`translate(${-(1-kL)*40},${(1-kL)*30})`);hmL.style.opacity=kL;
+  hmR.setAttribute('transform',`translate(0,${(1-kR)*60})`);hmR.style.opacity=kR;}
  shine.style.transform=`translate(${t>13.7?lerp(-200,hw+200,P(t,13.7,14.2,E.io3)):-300}px,-200px) rotate(20deg)`;
 
  /* ---- S2 ---- */
@@ -271,15 +290,23 @@ function render(t){
  lineIn(s5h[0],t,10.3,12.3);lineIn(s5h[1],t,10.38,12.34);
 
  /* ---- S6 ---- */
- T(word,CX,850,{o:t>13.0?1:0});
- letters.forEach((s,i)=>{const k=P(t,13.05+i*.045,13.65+i*.045,E.expo);s.style.transform=`translateY(${(1-k)*110}%)`;});
- const ek=P(t,13.35,14.05,E.expo);evo.style.letterSpacing=lerp(1.4,.5,ek)+'em';T(evo,CX+lerp(1.4,.5,ek)*20,948,{o:ek,b:(1-ek)*6});
- lineIn(tag,t,13.5,null);
- const ck=S(t,13.75,13,.5),press=t>14.45?1-.05*Math.sin(clamp((t-14.45)/.28)*Math.PI):1;T(cta,CX,1262,{s:lerp(.6,1,ck)*press,o:clamp(ck*1.6)});
+ // logo mark: the hero tile splits and morphs into the two traced pieces
+ logoSvg.style.opacity=t>=12.92?1:0;
+ if(t>=12.92){const mv=(st,fin,j0)=>st.map((p,i)=>{const k=S(t,12.92+(j0+i)*.012,11,.6);return[lerp(p[0],LX(fin[i][0]),k),lerp(p[1],LY(fin[i][1]),k)];});
+  const pL=pts(mv(ST_L,MK_L,0)),pR=pts(mv(ST_R,MK_R,3));
+  LG[0].setAttribute('points',pL);LG[1].setAttribute('points',pR);LG[2].setAttribute('points',pL);LG[3].setAttribute('points',pR);LG[4].setAttribute('points',pL);LG[5].setAttribute('points',pR);
+  const wo=P(t,13.2,13.65);LG[2].style.opacity=wo;LG[3].style.opacity=wo;
+  const sx=lerp(LX(-120),LX(260),P(t,13.75,14.3,E.io3));lgS.setAttribute('gradientTransform',`translate(${sx},0)`);LG[4].style.opacity=LG[5].style.opacity=t>13.75&&t<14.3?.8:0;}
+ // wordmark: cap top LY(161), baseline LY(188); line-height 1 → cap top sits .152em below the box top
+ const wTop=LY(161)-.152*96;T(word,CX,wTop+96*.6,{o:t>13.1?1:0});
+ letters.forEach((s,i)=>{const k=P(t,13.12+i*.045,13.72+i*.045,E.expo);s.style.transform=`translateY(${(1-k)*110}%)`;});
+ const ek=P(t,13.4,14.1,E.expo),ls=lerp(36,(179*LS-EVO_W0)/16,ek);evo.style.letterSpacing=ls+'px';T(evo,CX+ls/2,LY(197)-.152*34+17,{o:ek,b:(1-ek)*6});
+ lineIn(tag,t,13.6,null);
+ const ck=S(t,13.8,13,.5),press=t>14.45?1-.05*Math.sin(clamp((t-14.45)/.28)*Math.PI):1;T(cta,CX,1205,{s:lerp(.6,1,ck)*press,o:clamp(ck*1.6)});
  ctaSh.style.transform=`translateX(${lerp(-200,760,P(t,14.05,14.5,E.io3))}px) skewX(-18deg)`;
- const tk=P(t,14.45,14.95,E.o3);T(tap,CX+200,1262,{s:.3+tk*2.2,o:t>14.45?(1-tk)*.8:0});
- const uk=P(t,13.95,14.35,E.expo);T(url,CX,1380,{o:uk,b:(1-uk)*6});
+ const tk=P(t,14.45,14.95,E.o3);T(tap,CX+200,1205,{s:.3+tk*2.2,o:t>14.45?(1-tk)*.8:0});
+ const uk=P(t,13.95,14.35,E.expo);T(url,CX,1322,{o:uk,b:(1-uk)*6});
 }
 window.DURATION=15;window.seek=t=>render(t);
-window.ready=document.fonts.load('800 84px P').then(()=>Promise.all(['500 36px P','600 30px P','700 28px P','400 25px L','700 28px L'].map(f=>document.fonts.load(f)))).then(()=>document.fonts.ready).then(()=>{init();render(+(new URLSearchParams(location.search).get('t')||0));if(location.search.includes('ig'))document.body.classList.add('show-ig');});
+window.ready=document.fonts.load('800 84px P').then(()=>Promise.all(['500 36px P','400 34px P','700 96px P','600 30px P','700 28px P','400 25px L','700 28px L'].map(f=>document.fonts.load(f)))).then(()=>document.fonts.ready).then(()=>{init();render(+(new URLSearchParams(location.search).get('t')||0));if(location.search.includes('ig'))document.body.classList.add('show-ig');});
 </script></body></html>
